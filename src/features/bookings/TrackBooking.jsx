@@ -46,6 +46,13 @@ export default function TrackBooking() {
     }
   }
 
+  function resetSearch() {
+    setBooking(null);
+    setCode("");
+    setMobile("");
+    setError("");
+  }
+
   return (
     <PublicLayout>
       <section className="page-header">
@@ -54,54 +61,84 @@ export default function TrackBooking() {
       </section>
 
       <section className="section">
-        <form className="card track-form" onSubmit={handleSearch}>
-          <div className="field">
-            <label>Booking Code</label>
-            <input placeholder="e.g. JP1007" value={code} onChange={(e) => setCode(e.target.value)} />
-          </div>
-          <div className="field">
-            <label>Mobile Number</label>
-            <input placeholder="The number you booked with" value={mobile} onChange={(e) => setMobile(e.target.value)} />
-          </div>
-          {error && <p className="track-error">{error}</p>}
-          <button className="btn btn-gold btn-block" disabled={loading}>
-            {loading ? "Searching…" : "Track Booking"}
-          </button>
-        </form>
+        {!booking && (
+          <form className="card track-form" onSubmit={handleSearch}>
+            <div className="field">
+              <label>Booking Code</label>
+              <input
+                placeholder="e.g. JP1007"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label>Mobile Number</label>
+              <input
+                placeholder="The number you booked with"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+              />
+            </div>
+            {error && <p className="track-error">{error}</p>}
+            <button className="btn btn-gold btn-block" disabled={loading}>
+              {loading ? "Searching…" : "Track Booking"}
+            </button>
+          </form>
+        )}
 
         {booking && (
           <div className="card track-result">
             <div className="track-result-head">
               <div>
                 <h3>{booking.bookingCode}</h3>
-                <p className="track-result-sub">{booking.eventType} · {booking.eventDate}</p>
+                <p className="track-result-sub">
+                  {booking.eventType} · {booking.eventDate}
+                </p>
               </div>
-              <StatusBadge label={getTopLevelStatus(booking.stageIndex, booking.cancelled)} />
+              <StatusBadge
+                label={getTopLevelStatus(booking.stageIndex, booking.cancelled)}
+              />
             </div>
 
-             <div className="track-greeting">
-      <h4>Hi {booking.customerName},</h4>
-      <p className="track-greeting-sub">
-    "Your booking is on track — thanks for staying with us!
-  </p>
-    </div>
+            <div className="track-greeting">
+              <h4>Hi {booking.customerName},</h4>
+              <p className="track-greeting-sub">
+                Your booking is on track — thanks for staying with us!
+              </p>
+            </div>
 
             <div className="timeline">
               {STAGES.map((stage, idx) => {
                 const state =
-                  idx < (booking.stageIndex ?? 0) ? "done" : idx === (booking.stageIndex ?? 0) ? "active" : "";
-                const historyEntry = (booking.stageHistory || []).find((h) => h.stage === stage);
+                  idx < (booking.stageIndex ?? 0)
+                    ? "done"
+                    : idx === (booking.stageIndex ?? 0)
+                    ? "active"
+                    : "";
+                const historyEntry = (booking.stageHistory || []).find(
+                  (h) => h.stage === stage
+                );
                 return (
                   <div key={stage} className={`timeline-item ${state}`}>
-                    <div className="timeline-dot">{state === "done" ? "✓" : ""}</div>
+                    <div className="timeline-dot">
+                      {state === "done" ? "✓" : ""}
+                    </div>
                     <div className="t-title">{stage}</div>
                     <div className="t-date">
-                      {historyEntry ? new Date(historyEntry.date).toLocaleDateString() : state === "active" ? "In Progress" : "Upcoming"}
+                      {historyEntry
+                        ? new Date(historyEntry.date).toLocaleDateString()
+                        : state === "active"
+                        ? "In Progress"
+                        : "Upcoming"}
                     </div>
                   </div>
                 );
               })}
             </div>
+
+            <button className="btn btn-secondary btn-block" onClick={resetSearch}>
+              Search Again
+            </button>
           </div>
         )}
       </section>
