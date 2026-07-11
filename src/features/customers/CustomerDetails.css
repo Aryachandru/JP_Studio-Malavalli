@@ -1,0 +1,34 @@
+/* CustomerDetails.css — src/pages/CustomerDetails.jsx only */
+
+.customer-header-card {
+  margin-bottom: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.customer-header-avatar {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold-600);
+  background: var(--gold-050);
+}
+
+.customer-address-card { margin-bottom: 18px; }
+.customer-address-label { font-size: 13px; color: var(--ink-400); margin-bottom: 4px; }
+.customer-address-value { font-size: 14px; }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .customer-header-card { flex-wrap: wrap; }
+  .customer-header-card > button { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .customer-header-avatar { width: 52px; height: 52px; font-size: 18px; }
+}

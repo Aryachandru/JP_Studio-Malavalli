@@ -1,0 +1,70 @@
+/* BookNow.css — src/pages/public/BookNow.jsx only */
+
+.wizard-card { max-width: 640px; margin: 0 auto; }
+
+.steps-row { display: flex; justify-content: space-between; margin-bottom: 28px; }
+.step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; position: relative; }
+.step-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--border);
+  color: var(--ink-400);
+}
+.step-item.done .step-circle, .step-item.active .step-circle { background: var(--gold-500); color: #fff; }
+.step-item span.step-label { font-size: 12px; color: var(--ink-600); }
+
+.package-option { cursor: pointer; border-radius: 12px; padding: 12px 10px; border: 2px solid transparent; }
+.package-option.selected { border-color: var(--gold-500); }
+
+.wizard-note { font-size: 12px; color: var(--ink-400); margin-top: 10px; }
+
+.wizard-actions { display: flex; gap: 12px; margin-top: 24px; }
+
+.summary-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.summary-row:last-child { border-bottom: none; }
+.summary-label { font-size: 13px; color: var(--ink-400); flex: 1; }
+.summary-value { font-weight: 600; font-size: 14px; }
+
+.booking-success { text-align: center; padding: 20px 0; }
+.booking-success-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.booking-success-code {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--gold-600);
+  background: var(--gold-050);
+  border-radius: var(--radius-sm);
+  padding: 10px 20px;
+  display: inline-block;
+  margin: 10px 0;
+  letter-spacing: 1px;
+}
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .wizard-card { max-width: 100%; }
+  .step-item span.step-label { display: none; }
+}
+
+@media (max-width: 480px) {
+  .wizard-actions { flex-direction: column; }
+  .wizard-actions .btn { width: 100%; }
+  .booking-success-code { font-size: 20px; }
+}

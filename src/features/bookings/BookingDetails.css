@@ -1,0 +1,114 @@
+/* BookingDetails.css — src/pages/BookingDetails.jsx only */
+
+.booking-header-card {
+  margin-bottom: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.booking-header-avatar {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold-600);
+  background: var(--gold-050);
+}
+
+.booking-header-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Details (left) + Update Status (right) two-column layout.
+   Ratio is page-specific, so it lives here instead of being an
+   inline style — that's what lets the media query below collapse
+   it to a single column on tablet/mobile. */
+.booking-details-grid {
+  grid-template-columns: 1.4fr 1fr;
+  align-items: start;
+}
+
+.info-grid-item { margin-bottom: 10px; }
+.info-grid-label { font-size: 12px; color: var(--ink-400); }
+.info-grid-value { font-size: 14px; font-weight: 600; }
+
+/* ---------------- Status Timeline ---------------- */
+.timeline { position: relative; padding-left: 32px; }
+.timeline-item { position: relative; padding-bottom: 26px; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 26px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item:last-child::before { display: none; }
+.timeline-dot {
+  position: absolute;
+  left: -32px;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--border);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+}
+.timeline-item.done .timeline-dot { background: var(--green); }
+.timeline-item.active .timeline-dot { background: var(--gold-500); }
+.timeline-item .t-title { font-weight: 600; font-size: 14px; }
+.timeline-item .t-date { font-size: 12px; color: var(--ink-400); margin-top: 2px; }
+
+/* ---------------- Payments tab ---------------- */
+.payment-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.payment-summary-box {
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas);
+  text-align: center;
+}
+.payment-summary-box.paid { background: var(--green-bg); }
+.payment-summary-box.due { background: var(--red-bg); }
+.payment-summary-box.clear { background: var(--green-bg); }
+.payment-summary-label { font-size: 11px; color: var(--ink-600); margin-bottom: 6px; }
+.payment-summary-value { font-size: 16px; font-weight: 700; }
+
+.payment-history-head { font-size: 14px; margin: 18px 0 8px; }
+.payment-row { align-items: flex-start; }
+.payment-add-form { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+@media (max-width: 480px) {
+  .payment-summary-grid { grid-template-columns: 1fr; }
+}
+/* ---------------- Responsive ---------------- */
+@media (max-width: 1024px) {
+  .booking-details-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .booking-header-card { flex-wrap: wrap; }
+  .booking-header-card > button { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .booking-header-avatar { width: 52px; height: 52px; font-size: 18px; }
+  .timeline { padding-left: 26px; }
+  .timeline-dot { left: -26px; width: 16px; height: 16px; }
+}

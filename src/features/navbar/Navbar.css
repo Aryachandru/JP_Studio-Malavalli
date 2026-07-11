@@ -1,0 +1,98 @@
+/* Navbar.css — src/components/public/Navbar.jsx only */
+
+.public-navbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.public-navbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  gap: 18px;
+}
+
+.public-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--ink-900);
+}
+
+.public-logo-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.public-nav-links {
+  display: flex;
+  gap: 26px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-600);
+}
+.public-nav-links a.active { color: var(--gold-600); }
+.public-nav-links a:hover { color: var(--gold-600); }
+
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+
+.public-hamburger {
+  display: none;
+  border: none;
+  background: var(--bg-canvas);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.public-mobile-menu {
+  display: none;
+  flex-direction: column;
+  padding: 8px 20px 18px;
+  border-top: 1px solid var(--border);
+}
+
+.public-mobile-link {
+  padding: 12px 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-700, var(--ink-900));
+  border-bottom: 1px solid var(--border);
+}
+.public-mobile-link.active { color: var(--gold-600); }
+.public-mobile-divider { height: 6px; }
+.public-mobile-link.admin-link { color: var(--gold-600); border-bottom: none; }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 900px) {
+  .desktop-only { display: none; }
+  .public-hamburger { display: flex; align-items: center; justify-content: center; }
+  .public-mobile-menu.open,
+  .public-mobile-menu { display: flex; }
+}
+
+@media (min-width: 901px) {
+  .public-mobile-menu { display: none !important; }
+}
+
+@media (max-width: 480px) {
+  .public-navbar-inner { padding: 12px 16px; }
+  .public-brand-text { font-size: 13px; }
+}

@@ -1,0 +1,5 @@
+/* StatCard.css — src/components/StatCard.jsx
+   Intentionally empty of new rules: StatCard only uses the
+   shared .card / .stat-card classes already defined in
+   src/styles/common.css. Kept as its own file so if you ever
+   want a StatCard-only tweak, it has a clear home. */

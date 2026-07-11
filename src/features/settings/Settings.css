@@ -1,0 +1,27 @@
+/* Settings.css — src/pages/Settings.jsx only */
+
+.settings-layout { grid-template-columns: 1fr 1fr; }
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  cursor: pointer;
+}
+.settings-row:hover { background: var(--bg-canvas); }
+.settings-row-left { display: flex; align-items: center; gap: 12px; }
+.settings-chevron { color: var(--ink-400); }
+
+.settings-version { margin-top: 24px; text-align: center; color: var(--ink-400); font-size: 12px; }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 1024px) {
+  .settings-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .settings-row { padding: 12px; }
+}

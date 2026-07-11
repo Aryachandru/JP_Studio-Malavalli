@@ -1,0 +1,58 @@
+/* OfferBanner.css — src/features/offers/OfferBanner.jsx only */
+
+.offer-banner {
+  background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  font-size: 13px;
+  overflow: hidden;
+}
+
+.offer-banner-icon { font-size: 15px; flex-shrink: 0; }
+
+.offer-banner-viewport {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.offer-banner-track {
+  display: inline-flex;
+}
+
+.offer-banner-track.scrolling {
+  animation: offer-marquee 22s linear infinite;
+}
+
+.offer-banner-item {
+  display: inline-block;
+  padding-right: 60px;
+}
+
+@keyframes offer-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.offer-banner-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 13px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+.offer-banner-close:hover { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .offer-banner-track.scrolling { animation: none; }
+  .offer-banner-viewport { overflow-x: auto; }
+}
+
+@media (max-width: 480px) {
+  .offer-banner { padding: 8px 14px; font-size: 12px; }
+  .offer-banner-track.scrolling { animation-duration: 16s; }
+}

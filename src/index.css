@@ -1,0 +1,8 @@
+/* index.css — loaded once in index.js.
+   Pulls in the two GLOBAL, shared files only. Every component
+   and page below has its OWN css file (e.g. Sidebar.jsx ->
+   Sidebar.css, Dashboard.jsx -> Dashboard.css) imported
+   directly inside that file, so you can debug one page's
+   styles without hunting through a giant stylesheet. */
+@import "./styles/variables.css";
+@import "./styles/common.css";

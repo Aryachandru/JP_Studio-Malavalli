@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Bookings: customers can CREATE (public booking form) and GET their
+    // own booking by its exact code (Track Booking page). Browsing/editing
+    // ALL bookings (the admin Bookings list, status updates, etc.) requires
+    // being signed in as admin.
+    match /bookings/{bookingId} {
+      allow create: if true;
+      allow get: if true;
+      allow list: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Customers are keyed by phone number. Public booking flow needs to
+    // create/update its own stats; browsing the full Clients list is
+    // admin-only.
+    match /customers/{mobile} {
+      allow create, update: if true;
+      allow get: if true;
+      allow list: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // Packages, gallery photos, offers, and studio settings are all
+    // publicly READABLE (shown on the public site) but only the signed-in
+    // admin can create/edit/delete them.
+    match /packages/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /galleryPhotos/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /offers/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // In-app admin notification bell — admin only.
+    match /notifications/{id} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Single shared counter doc used to hand out sequential booking codes
+    // (JP1001, JP1002, ...) to BOTH public customers and admin staff.
+    // It only ever stores a number, so there's no privacy concern in
+    // letting anyone increment it.
+    match /counters/{id} {
+      allow get, create, update: if true;
+    }
+  }
+}

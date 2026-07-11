@@ -1,0 +1,152 @@
+/* ===========================================================
+   common.css — the shared UI kit: buttons, cards, badges,
+   form fields, tabs, list rows, pagination.
+   These classes (.card, .btn, .badge, .field, .grid...) are
+   used identically on almost every page, so they live here
+   ONCE instead of being copy-pasted into every page's CSS
+   file. Page-specific layout/media-queries live in each
+   page's own <PageName>.css file — this file only holds the
+   truly shared, reusable pieces.
+=========================================================== */
+
+.grid { display: grid; gap: 18px; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.stat-card .stat-label { font-size: 13px; color: var(--ink-600); margin-bottom: 8px; }
+.stat-card .stat-value { font-size: 26px; font-weight: 700; color: var(--ink-900); }
+.stat-card .stat-delta { font-size: 12px; color: var(--green); margin-top: 6px; font-weight: 600; }
+
+.btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-gold { background: linear-gradient(135deg, var(--gold-500), var(--gold-600)); color: #fff; }
+.btn-gold:hover { filter: brightness(1.05); }
+.btn-outline { background: var(--gold-050); color: var(--gold-600); border: 1px solid #f0dcb5; }
+.btn-ghost { background: transparent; color: var(--ink-600); border: 1px solid var(--border); }
+.btn-block { width: 100%; justify-content: center; padding: 13px; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.list-row:last-child { border-bottom: none; }
+
+.avatar-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--bg-canvas);
+  flex-shrink: 0;
+}
+.avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 13px; font-weight: 600; color: var(--ink-900); margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fbfbfd;
+  outline: none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--gold-500);
+  background: #fff;
+}
+
+.tab-row { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.tab-pill {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--ink-600);
+}
+.tab-pill.active { background: var(--gold-500); color: #fff; border-color: var(--gold-500); }
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+.search-box input { border: none; outline: none; flex: 1; background: transparent; }
+
+.pagination { display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 20px; }
+.page-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 13px;
+  color: var(--ink-600);
+}
+.page-btn.active { background: var(--gold-500); color: #fff; border-color: var(--gold-500); }
+
+.empty-state { text-align: center; padding: 60px 20px; color: var(--ink-400); }
+.loading-line { padding: 40px; text-align: center; color: var(--ink-400); }
+
+/* ---- Shared responsive rules that apply to every page's cards/grids ---- */
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  .card { padding: 16px; border-radius: var(--radius-md); }
+  .btn { padding: 10px 14px; font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  .stat-card .stat-value { font-size: 22px; }
+  .tab-row { gap: 6px; }
+  .tab-pill { padding: 7px 12px; font-size: 12px; }
+  .list-row { gap: 10px; }
+  .avatar-thumb, .avatar-circle { width: 36px; height: 36px; }
+}

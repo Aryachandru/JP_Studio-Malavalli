@@ -1,0 +1,53 @@
+/* Reports.css — src/pages/Reports.jsx only */
+
+.report-bar-row { margin-bottom: 14px; }
+.report-bar-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.report-bar-track { background: var(--border); border-radius: 6px; height: 8px; }
+.report-bar-fill {
+  background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+  height: 8px;
+  border-radius: 6px;
+}
+
+@media (max-width: 480px) {
+  .report-bar-head { font-size: 12px; }
+}
+
+.reports-month-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.reports-month-picker h3 { font-size: 16px; }
+
+.compare-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.compare-col {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas);
+  text-align: center;
+}
+.compare-col.highlight {
+  background: var(--gold-050);
+  border: 1px solid #f0dcb5;
+}
+.compare-month-label { font-size: 12px; color: var(--ink-400); margin-bottom: 6px; }
+.compare-value { font-weight: 700; font-size: 15px; }
+.compare-arrow { font-size: 20px; color: var(--ink-400); }
+
+@media (max-width: 480px) {
+  .compare-row { flex-direction: column; }
+  .compare-arrow { transform: rotate(90deg); }
+  .reports-month-picker h3 { font-size: 14px; }
+}

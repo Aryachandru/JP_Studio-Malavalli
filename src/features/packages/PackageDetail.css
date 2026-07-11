@@ -1,0 +1,52 @@
+/* PackageDetail.css — src/features/packages/PackageDetail.jsx only */
+
+.package-detail-section { max-width: 640px; }
+
+.package-detail-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.package-detail-hero {
+  width: 100%;
+  height: 220px;
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas) center/cover no-repeat;
+  margin-bottom: 16px;
+}
+
+.package-detail-category {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold-600);
+  background: var(--gold-050);
+  padding: 4px 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.package-detail-card h1 { font-size: 24px; margin-bottom: 6px; }
+.package-detail-price { font-size: 22px; font-weight: 700; color: var(--gold-600); margin-bottom: 14px; }
+.package-detail-desc { color: var(--ink-600); font-size: 14px; margin-bottom: 20px; }
+
+.package-detail-subhead { font-size: 15px; margin-bottom: 10px; }
+.package-detail-inclusions {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+}
+.package-detail-inclusions li {
+  font-size: 14px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.package-detail-inclusions li:last-child { border-bottom: none; }
+
+.package-detail-cta { padding: 14px; font-size: 15px; }
+
+@media (max-width: 480px) {
+  .package-detail-hero { height: 160px; }
+  .package-detail-card h1 { font-size: 20px; }
+}

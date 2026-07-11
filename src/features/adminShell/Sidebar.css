@@ -1,0 +1,109 @@
+/* Sidebar.css — styles for src/components/Sidebar.jsx only. */
+
+.sidebar {
+  width: 250px;
+  background: var(--navy-900);
+  color: #cfd2de;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-brand .logo-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.sidebar-brand .brand-text b { display: block; color: #fff; font-size: 14px; letter-spacing: 0.5px; }
+.sidebar-brand .brand-text span { font-size: 11px; color: var(--ink-400); letter-spacing: 1px; }
+
+.sidebar-close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  color: #cfd2de;
+  font-size: 18px;
+}
+
+.sidebar-nav { padding: 14px 12px; flex: 1; overflow-y: auto; }
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: #b6bacb;
+  margin-bottom: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sidebar-link:hover { background: rgba(255, 255, 255, 0.05); color: #fff; }
+.sidebar-link.active { background: var(--gold-500); color: #fff; font-weight: 600; }
+.sidebar-link .icon { font-size: 16px; width: 18px; text-align: center; }
+
+.sidebar-footer { padding: 14px 20px 20px; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 20, 0.5);
+  z-index: 40;
+}
+
+/* ---------------- Responsive: sidebar becomes a slide-in drawer ---------------- */
+
+/* Laptop: slightly narrower rail, still always visible */
+@media (max-width: 1024px) {
+  .sidebar { width: 220px; }
+}
+
+/* Tablet & mobile: sidebar becomes an off-canvas drawer toggled by the
+   hamburger button in Topbar.jsx */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 8px 0 24px rgba(0, 0, 0, 0.25);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-close-btn { display: block; }
+  .sidebar-overlay.open { display: block; }
+}
+
+@media (max-width: 480px) {
+  .sidebar { width: 82vw; max-width: 280px; }
+}
+
+.sidebar-view-site {
+  margin-left: auto;
+  color: #cfd2de;
+  font-size: 15px;
+  text-decoration: none;
+}
+.sidebar-view-site:hover { color: #fff; }

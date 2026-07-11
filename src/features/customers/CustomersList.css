@@ -1,0 +1,23 @@
+/* CustomersList.css — src/pages/CustomersList.jsx only */
+
+.clients-search { max-width: 420px; margin-bottom: 16px; }
+
+.client-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--gold-600);
+  background: var(--gold-050);
+}
+
+.client-row-stats { text-align: right; }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .clients-search { max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .client-row-stats { font-size: 12px; }
+}

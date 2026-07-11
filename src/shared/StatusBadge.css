@@ -1,0 +1,5 @@
+/* StatusBadge.css — src/components/StatusBadge.jsx
+   Intentionally empty of new rules: uses the shared .badge
+   class from src/styles/common.css (colors are set inline
+   per status in the component itself). Kept as its own file
+   for the same reason as StatCard.css. */

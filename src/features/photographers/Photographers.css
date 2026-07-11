@@ -1,0 +1,14 @@
+/* Photographers.css — src/pages/Photographers.jsx only */
+
+.photographer-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--gold-600);
+  background: var(--gold-050);
+}
+
+@media (max-width: 480px) {
+  .photographer-avatar { width: 36px; height: 36px; }
+}

@@ -1,0 +1,77 @@
+/* Packages.css — src/pages/Packages.jsx only */
+
+.packages-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.package-thumb {
+  background-size: cover;
+  background-position: center;
+}
+
+.package-status-badge { margin-top: 4px; cursor: pointer; }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 768px) {
+  .packages-toolbar { justify-content: stretch; }
+  .packages-toolbar .btn { width: 100%; }
+}
+
+.package-row-inclusions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.inclusion-input-row {
+  display: flex;
+  gap: 8px;
+}
+.inclusion-input-row input { flex: 1; }
+
+.inclusion-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.inclusion-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold-050);
+  color: var(--gold-600);
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.inclusion-chip button {
+  border: none;
+  background: transparent;
+  color: var(--gold-600);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+.inclusion-chip.small { padding: 3px 8px; font-size: 11px; }
+
+.inclusion-empty, .inclusion-more {
+  font-size: 12px;
+  color: var(--ink-400);
+}
+
+@media (max-width: 480px) {
+  .inclusion-input-row { flex-direction: column; }
+  .inclusion-input-row .btn { width: 100%; }
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--ink-400);
+  margin: -10px 0 0;
+}

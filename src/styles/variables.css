@@ -1,0 +1,82 @@
+/* ===========================================================
+   variables.css — design tokens + base reset only.
+   Loaded once (via index.css) so every page/component CSS
+   file below can reference var(--gold-500) etc. without
+   redefining it. Nothing page-specific lives here.
+=========================================================== */
+:root {
+  --navy-900: #191d2e;
+  --navy-800: #20263b;
+  --navy-700: #2a3149;
+  --gold-500: #cf8a1d;
+  --gold-600: #b97815;
+  --gold-050: #fdf1de;
+  --bg-canvas: #f4f5f9;
+  --white: #ffffff;
+  --ink-900: #1c1f2a;
+  --ink-600: #5b6072;
+  --ink-400: #8b90a0;
+  --border: #ecedf2;
+  --green-bg: #e6f4ea;
+  --green: #1e8e3e;
+  --blue-bg: #e8eefc;
+  --blue: #3b5fe0;
+  --purple-bg: #f3e8fd;
+  --purple: #8a3fd1;
+  --red-bg: #fdeaea;
+  --red: #d93025;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 2px 10px rgba(20, 24, 40, 0.06);
+  --font-display: "Poppins", "Inter", sans-serif;
+  --font-body: "Inter", "Poppins", sans-serif;
+
+  /* Breakpoints, for reference in comments across files:
+     mobile  <= 480px
+     tablet  <= 768px
+     laptop  <= 1024px
+     desktop  > 1024px (default) */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-canvas);
+  color: var(--ink-900);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+input, select, textarea {
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #d8dae3;
+  border-radius: 8px;
+}
