@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../adminShell/Layout";
-import { createBooking } from "./bookingService";
+import { createBooking, subscribeToBookedDates } from "./bookingService";
+import BookingCalendar from "./BookingCalendar";
 import { upsertCustomerFromBooking } from "../customers/customerService";
 import { subscribeToPackages, PACKAGE_CATEGORIES } from "../packages/packageService";
 import "./AddBooking.css";
@@ -12,6 +13,7 @@ export default function AddBooking() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [packages, setPackages] = useState([]);
+  const [bookedDates, setBookedDates] = useState({});
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     customerName: "",
@@ -33,7 +35,11 @@ export default function AddBooking() {
     };
   }, []);
 
-  // Cascading dropdown: only show packages matching the chosen event type.
+  useEffect(() => {
+    const unsub = subscribeToBookedDates(setBookedDates);
+    return () => unsub();
+  }, []);
+
   const packagesForEventType = form.eventType
     ? packages.filter((p) => p.category === form.eventType)
     : packages;
@@ -116,7 +122,19 @@ export default function AddBooking() {
             </div>
             <div className="field">
               <label>Event Date</label>
-              <input type="date" value={form.eventDate} onChange={(e) => update("eventDate", e.target.value)} />
+              <BookingCalendar
+                value={form.eventDate}
+                onChange={(iso) => update("eventDate", iso)}
+                bookedDates={bookedDates}
+              />
+              {form.eventDate && (
+                <p style={{ fontSize: 12, color: "var(--ink-400)", marginTop: 8 }}>
+                  Selected: {new Date(form.eventDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                  {(bookedDates[form.eventDate] || 0) > 0 && (
+                    <> · ⚠️ {bookedDates[form.eventDate]} other booking{bookedDates[form.eventDate] > 1 ? "s" : ""} already on this date</>
+                  )}
+                </p>
+              )}
             </div>
             <div className="field">
               <label>Event Location</label>

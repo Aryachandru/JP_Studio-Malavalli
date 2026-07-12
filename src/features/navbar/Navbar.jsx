@@ -19,10 +19,13 @@ export default function Navbar() {
   return (
     <header className="public-navbar">
       <div className="public-navbar-inner">
-        <NavLink to="/" className="public-brand" onClick={() => setOpen(false)}>
-          <span className="public-logo-badge">JP</span>
-          <span className="public-brand-text">JP STUDIO</span>
-        </NavLink>
+       <NavLink to="/" className="public-brand" onClick={() => setOpen(false)}>
+  <span className="public-logo-badge">
+    <img src="/images/JPsLogo.jpeg" alt="JP Studio Logo" className="public-logo-img" />
+  </span>
+  <span className="public-brand-text">JP STUDIO</span>
+</NavLink>
+
 
         <nav className="public-nav-links desktop-only">
           {LINKS.map((l) => (

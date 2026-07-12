@@ -27,6 +27,23 @@ export async function ensureNotificationPermission() {
   return Notification.requestPermission();
 }
 
+// Generic one-off browser push — used by Topbar.jsx to alert the admin
+// the instant a new booking notification lands in Firestore, on
+// whichever admin page they happen to be looking at right now (not just
+// the Dashboard). Unlike notifyTomorrowBookings below, this fires every
+// time it's called — the caller (Topbar) is responsible for only calling
+// it once per genuinely new notification, not on every render.
+export function fireBrowserNotification(title, body) {
+  if (!("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
+  try {
+    // eslint-disable-next-line no-new
+    new Notification(title, { body, icon: "/logo192.png", tag: "jpstudio-live" });
+  } catch (err) {
+    console.warn("Notification failed:", err);
+  }
+}
+
 // Call this once per Dashboard load with the list of bookings happening
 // tomorrow. It only actually fires a notification once per calendar day,
 // so re-renders / re-mounts don't spam the admin repeatedly.
@@ -37,7 +54,7 @@ export function notifyTomorrowBookings(bookingsTomorrow) {
 
   const todayKey = new Date().toISOString().slice(0, 10);
   const lastNotified = localStorage.getItem(STORAGE_KEY);
-  if (lastNotified === todayKey) return; // already notified today
+  if (lastNotified === todayKey) return;
 
   const count = bookingsTomorrow.length;
   const first = bookingsTomorrow[0];
@@ -56,8 +73,6 @@ export function notifyTomorrowBookings(bookingsTomorrow) {
     });
     localStorage.setItem(STORAGE_KEY, todayKey);
   } catch (err) {
-    // Some browsers (e.g. iOS Safari home-screen web apps) restrict this —
-    // fail silently, the in-app Dashboard widget still shows the reminder.
     console.warn("Notification failed:", err);
   }
 }

@@ -46,9 +46,21 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
-    // In-app admin notification bell — admin only.
+    // In-app admin notification bell. Anyone can CREATE one (this is how
+    // the public Book Now wizard alerts the admin the instant a customer
+    // books) — but only the signed-in admin can read, list, update
+    // (mark-as-read), or delete them.
     match /notifications/{id} {
-      allow read, write: if request.auth != null;
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Project inquiries submitted from the Developer page's "Get Started"
+    // form. Anyone can submit one; only the signed-in admin can read them
+    // back (review in Firestore Console, or wire up an admin view later).
+    match /projectInquiries/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
     }
 
     // Single shared counter doc used to hand out sequential booking codes
@@ -56,6 +68,16 @@ service cloud.firestore {
     // It only ever stores a number, so there's no privacy concern in
     // letting anyone increment it.
     match /counters/{id} {
+      allow get, create, update: if true;
+    }
+
+    // Availability calendar — one doc per date, storing ONLY a count of
+    // active bookings on that date. No customer name, phone, or any
+    // other private detail ever lands here. This is what lets the public
+    // Book Now calendar show "already booked" without needing "list"
+    // access to the real /bookings collection.
+    match /bookedDates/{isoDate} {
+      allow read: if true;
       allow get, create, update: if true;
     }
   }

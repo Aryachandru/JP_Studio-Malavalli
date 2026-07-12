@@ -107,8 +107,8 @@
   justify-content: center;
 }
 .dev-photo-circle {
-  width: 260px;
-  height: 260px;
+  width: 290px;
+  height: 290px;
   border-radius: 50%;
   background: var(--dp-lavender);
   overflow: hidden;
@@ -125,7 +125,7 @@
 
 .dev-name-tag {
   position: absolute;
-  bottom: 6px;
+  bottom: -15px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--dp-purple);

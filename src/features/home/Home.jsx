@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PublicLayout from "../publicLayout/PublicLayout";
 import { subscribeToPackages } from "../packages/packageService";
-import { subscribeToGallery } from "../gallery/galleryService";
+//import { subscribeToGallery } from "../gallery/galleryService";
 import { subscribeToSettings } from "../settings/settingsService";
 import "./Home.css";
 
@@ -16,22 +16,22 @@ const QUICK_LINKS = [
 
 export default function Home() {
   const [packages, setPackages] = useState([]);
-  const [photos, setPhotos] = useState([]);
+  //const [photos, setPhotos] = useState([]);
   const [settings, setSettings] = useState({});
 
   useEffect(() => {
     const unsub1 = subscribeToPackages(setPackages);
-    const unsub2 = subscribeToGallery(setPhotos);
+    //const unsub2 = subscribeToGallery(setPhotos);
     const unsub3 = subscribeToSettings((data) => data && setSettings(data));
     return () => {
       unsub1();
-      unsub2();
+    //  unsub2();
       unsub3();
     };
   }, []);
 
   const featuredPackages = packages.filter((p) => p.status === "Active").slice(0, 3);
-  const previewPhotos = photos.slice(0, 6);
+  //const previewPhotos = photos.slice(0, 6);
 
   return (
     <PublicLayout>

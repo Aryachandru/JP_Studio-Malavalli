@@ -1,0 +1,101 @@
+/* BookingCalendar.css — src/features/bookings/BookingCalendar.jsx only */
+
+.bcal {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background: #fbfbfd;
+}
+
+.bcal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.bcal-nav-btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--ink-600);
+}
+.bcal-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.bcal-month-label { font-weight: 700; font-size: 14px; }
+
+.bcal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.bcal-day-name {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-400);
+  padding-bottom: 6px;
+}
+
+.bcal-cell {
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--ink-900);
+  cursor: pointer;
+}
+.bcal-cell:hover:not(:disabled) { border-color: var(--gold-500); }
+.bcal-cell.muted { visibility: hidden; }
+
+.bcal-cell.disabled {
+  color: var(--ink-400);
+  background: #f3f3f6;
+  cursor: not-allowed;
+}
+.bcal-cell.booked {
+  background: var(--red-bg);
+  color: var(--red);
+  font-weight: 600;
+  position: relative;
+}
+.bcal-booked-dot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--red);
+}
+.bcal-cell.selected {
+  background: var(--gold-500);
+  color: #fff;
+  font-weight: 700;
+}
+
+.bcal-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--ink-600);
+}
+.bcal-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.bcal-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.bcal-swatch.available { background: #fff; border: 1px solid var(--border); }
+.bcal-swatch.booked { background: var(--red-bg); border: 1px solid var(--red); }
+.bcal-swatch.selected { background: var(--gold-500); }
+
+@media (max-width: 480px) {
+  .bcal-cell { font-size: 12px; }
+}

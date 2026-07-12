@@ -7,6 +7,15 @@
   top: 0;
   z-index: 100;
 }
+.public-logo-img {
+  width: 40px;          /* control size */
+  height: 40px;         /* keep square */
+  border-radius: 50%;   /* round logo */
+  object-fit: cover;    /* crop nicely */
+  border: 2px solid #d4af37; /* optional gold border */
+  vertical-align: middle;
+}
+
 
 .public-navbar-inner {
   max-width: 1200px;

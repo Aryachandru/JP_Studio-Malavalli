@@ -1,14 +1,33 @@
 import React, { useEffect, useState, useRef } from "react";
 import { subscribeToNotifications, markNotificationRead } from "./notificationService";
+import { fireBrowserNotification } from "./reminderNotifications";
 import "./Topbar.css";
 
 export default function Topbar({ title, onMenuClick }) {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const wrapRef = useRef(null);
+  // Tracks notification IDs we've already seen, so we only push-alert for
+  // ones that are genuinely NEW — not the batch that loads in on first
+  // mount (which would otherwise fire a browser notification for every
+  // old item every time the admin opens a page).
+  const seenIdsRef = useRef(null);
 
   useEffect(() => {
-    const unsub = subscribeToNotifications(setNotifications);
+    const unsub = subscribeToNotifications((rows) => {
+      if (seenIdsRef.current === null) {
+        // First load on this page — just remember what's already here,
+        // don't push-alert for any of it.
+        seenIdsRef.current = new Set(rows.map((n) => n.id));
+      } else {
+        const newOnes = rows.filter((n) => !seenIdsRef.current.has(n.id));
+        newOnes.forEach((n) => {
+          fireBrowserNotification("JP Studio", n.message);
+          seenIdsRef.current.add(n.id);
+        });
+      }
+      setNotifications(rows);
+    });
     return () => unsub();
   }, []);
 

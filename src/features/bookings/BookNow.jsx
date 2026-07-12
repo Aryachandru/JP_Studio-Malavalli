@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import PublicLayout from "../publicLayout/PublicLayout";
-import { createBooking } from "./bookingService";
+import { createBooking, subscribeToBookedDates } from "./bookingService";
+import BookingCalendar from "./BookingCalendar";
 import { upsertCustomerFromBooking } from "../customers/customerService";
 import { subscribeToPackages, PACKAGE_CATEGORIES } from "../packages/packageService";
+import { subscribeToSettings } from "../settings/settingsService";
 import "./BookNow.css";
 
 const STEPS = ["Event Details", "Package", "Review", "Confirmation"];
@@ -14,6 +16,8 @@ export default function BookNow() {
 
   const [step, setStep] = useState(0);
   const [packages, setPackages] = useState([]);
+  const [bookedDates, setBookedDates] = useState({});
+  const [settings, setSettings] = useState({});
   const [saving, setSaving] = useState(false);
   const [confirmedCode, setConfirmedCode] = useState(null);
   const [form, setForm] = useState({
@@ -31,7 +35,6 @@ export default function BookNow() {
     const unsub = subscribeToPackages((rows) => {
       const active = rows.filter((p) => p.status === "Active");
       setPackages(active);
-      // If arriving with ?package=Name, lock in its price (and event type) too.
       if (preselectedPackage) {
         const match = active.find((p) => p.name === preselectedPackage);
         if (match) {
@@ -43,8 +46,16 @@ export default function BookNow() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Cascading dropdown: only show packages that match the chosen event type.
-  // If the customer picked "Wedding", only Wedding packages appear in Step 2.
+  useEffect(() => {
+    const unsub = subscribeToBookedDates(setBookedDates);
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = subscribeToSettings((data) => data && setSettings(data));
+    return () => unsub();
+  }, []);
+
   const packagesForEventType = form.eventType
     ? packages.filter((p) => p.category === form.eventType)
     : packages;
@@ -128,8 +139,6 @@ export default function BookNow() {
                   value={form.eventType}
                   onChange={(e) => {
                     update("eventType", e.target.value);
-                    // Changing event type resets any package chosen from a
-                    // different category, since it would no longer be valid.
                     setForm((f) => ({ ...f, eventType: e.target.value, packageName: "", amount: "" }));
                   }}
                 >
@@ -141,7 +150,28 @@ export default function BookNow() {
               </div>
               <div className="field">
                 <label>Event Date</label>
-                <input type="date" value={form.eventDate} onChange={(e) => update("eventDate", e.target.value)} />
+                <BookingCalendar
+                  value={form.eventDate}
+                  onChange={(iso) => update("eventDate", iso)}
+                  bookedDates={bookedDates}
+                />
+                {form.eventDate && (bookedDates[form.eventDate] || 0) > 0 && (
+                  <div className="date-warning-banner">
+                    ⚠️ <strong>{new Date(form.eventDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</strong> already
+                    has a booking with us. You can still request this date, but we recommend
+                    {settings.contactPhone ? (
+                      <> calling us at <a href={`tel:${settings.contactPhone}`}>{settings.contactPhone}</a> first</>
+                    ) : (
+                      " contacting us first"
+                    )}{" "}
+                    to confirm we can fit you in before booking online.
+                  </div>
+                )}
+                {form.eventDate && !(bookedDates[form.eventDate] || 0) && (
+                  <p className="wizard-note" style={{ marginTop: 8 }}>
+                    Selected: {new Date(form.eventDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                  </p>
+                )}
               </div>
               <div className="field">
                 <label>Event Location</label>

@@ -1,4 +1,4 @@
-// src/features/bookings/bookingService.js
+// src/firebase/bookingService.js
 import {
   collection,
   doc,
@@ -9,16 +9,55 @@ import {
   query,
   orderBy,
   serverTimestamp,
-  getDocs,
+  getDoc,
   runTransaction,
-  where
+  increment,
 } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { STAGES } from "../../shared/statuses";
-
+import { createNotification } from "../adminShell/notificationService";
 
 const bookingsCol = collection(db, "bookings");
+const bookedDatesCol = collection(db, "bookedDates");
 
+// -----------------------------------------------------------------------
+// AVAILABILITY CALENDAR (public-safe)
+// `bookedDates/{isoDate}` stores ONLY a date and a count — never a name,
+// phone number, or anything else private. It's what lets the public Book
+// Now page show "this date already has a booking" without needing
+// Firestore "list" access to the real /bookings collection (which stays
+// admin-only). Kept in sync automatically by createBooking/cancelBooking/
+// deleteBooking below — you never touch this collection directly.
+// -----------------------------------------------------------------------
+async function bumpBookedDateCount(isoDate, delta) {
+  if (!isoDate) return;
+  const ref = doc(bookedDatesCol, isoDate);
+  await setDoc(ref, { count: increment(delta) }, { merge: true });
+}
+
+// PUBLIC-SAFE: live list of { date, count } for every date that has at
+// least one active booking. Used by the Book Now availability calendar.
+export function subscribeToBookedDates(callback) {
+  return onSnapshot(bookedDatesCol, (snap) => {
+    const map = {};
+    snap.docs.forEach((d) => {
+      const count = d.data().count || 0;
+      if (count > 0) map[d.id] = count;
+    });
+    callback(map);
+  });
+}
+
+// -----------------------------------------------------------------------
+// IMPORTANT DESIGN NOTE:
+// Each booking's Firestore *document ID* is the human-readable booking
+// code itself (e.g. "JP1007") instead of a random auto-id. This is what
+// lets a customer look their own booking up on the public Track Booking
+// page with a plain getDoc() — no login, no Firestore "list" permission
+// needed (which stays admin-only). The number is handed out from a
+// single counters/bookingCounter doc via a transaction, so it stays
+// unique even though public users and the admin can both create bookings.
+// -----------------------------------------------------------------------
 async function getNextBookingCode() {
   const counterRef = doc(db, "counters", "bookingCounter");
   const nextCount = await runTransaction(db, async (tx) => {
@@ -31,6 +70,8 @@ async function getNextBookingCode() {
   return `JP${1000 + nextCount}`;
 }
 
+// Live-subscribe to ALL bookings, newest first. ADMIN ONLY (Firestore
+// rules require auth for "list" queries against /bookings).
 export function subscribeToBookings(callback) {
   const q = query(bookingsCol, orderBy("createdAt", "desc"));
   return onSnapshot(q, (snap) => {
@@ -39,6 +80,7 @@ export function subscribeToBookings(callback) {
   });
 }
 
+// ADMIN ONLY (used on the Booking Details page, which is behind login).
 export function subscribeToBooking(bookingId, callback) {
   const ref = doc(db, "bookings", bookingId);
   return onSnapshot(ref, (snap) => {
@@ -49,10 +91,14 @@ export function subscribeToBooking(bookingId, callback) {
 
 export async function getBookingOnce(bookingId) {
   const ref = doc(db, "bookings", bookingId);
-  const snap = await getDocs(ref);
+  const snap = await getDoc(ref);
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 
+// PUBLIC-SAFE: a customer types their exact booking code + mobile number
+// on the Track Booking page. We fetch the single doc by ID (allowed for
+// anyone under the rules), then verify the mobile number matches before
+// handing back any data.
 // Strips everything except digits, then keeps only the last 10 digits —
 // this makes "+91 98765 43210", "9876543210", and "091-9876543210" all
 // normalize to the same value, regardless of how anyone typed it.
@@ -62,32 +108,23 @@ export function normalizeMobile(value) {
 }
 
 export async function trackBookingByCodeAndMobile(bookingCode, mobile) {
+  const ref = doc(db, "bookings", bookingCode.trim().toUpperCase());
+  let snap;
   try {
-    const normalizedCode = bookingCode.trim().toUpperCase();
-    const normalizedMobile = normalizeMobile(mobile);
-
-    const q = query(
-      collection(db, "bookings"),
-      where("bookingCode", "==", normalizedCode)
-    );
-
-    const snap = await getDocs(q);
-
-    if (snap.empty) return { error: "not_found" };
-
-    const docData = snap.docs[0].data();
-
-    if (normalizeMobile(docData.mobile) !== normalizedMobile) {
-      return { error: "mismatch" };
-    }
-
-    return { booking: { id: snap.docs[0].id, ...docData } };
+    snap = await getDoc(ref);
   } catch (err) {
     return { error: "firebase_error", firebaseCode: err.code, firebaseMessage: err.message };
   }
+  if (!snap.exists()) return { error: "not_found" };
+  const data = snap.data();
+  if (normalizeMobile(data.mobile) !== normalizeMobile(mobile)) {
+    return { error: "mismatch" };
+  }
+  return { booking: { id: snap.id, ...data } };
 }
 
-
+// Creates a booking. `source` is "public" (customer used the Book Now
+// wizard) or "admin" (staff booked on the customer's behalf).
 export async function createBooking(data, source = "public") {
   const code = await getNextBookingCode();
   const ref = doc(bookingsCol, code);
@@ -118,11 +155,36 @@ export async function createBooking(data, source = "public") {
     createdAt: serverTimestamp(),
   });
 
+  await bumpBookedDateCount(data.eventDate, 1);
+
+  // Only alert the admin for bookings customers made themselves — no
+  // point notifying admin about a booking admin just typed in personally.
+  if (source === "public") {
+    const prettyDate = new Date(data.eventDate).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
+    await createNotification(
+      `New booking: ${data.customerName} · ${data.eventType} · ${prettyDate} (${code})`
+    );
+  }
+
   return { id: code };
 }
 
 export async function updateBooking(bookingId, data) {
   const ref = doc(db, "bookings", bookingId);
+
+  if (data.eventDate) {
+    const snap = await getDoc(ref);
+    const oldDate = snap.exists() ? snap.data().eventDate : null;
+    const wasCancelled = snap.exists() ? snap.data().cancelled : false;
+    if (oldDate && oldDate !== data.eventDate && !wasCancelled) {
+      await bumpBookedDateCount(oldDate, -1);
+      await bumpBookedDateCount(data.eventDate, 1);
+    }
+  }
+
   return updateDoc(ref, data);
 }
 
@@ -137,17 +199,17 @@ export async function updateBookingStage(bookingId, newStageIndex, existingHisto
 
 export async function cancelBooking(bookingId) {
   const ref = doc(db, "bookings", bookingId);
-  return updateDoc(ref, { cancelled: true });
+  const snap = await getDoc(ref);
+  const data = snap.exists() ? snap.data() : null;
+  await updateDoc(ref, { cancelled: true });
+  if (data && !data.cancelled) {
+    await bumpBookedDateCount(data.eventDate, -1);
+  }
 }
 
 // -----------------------------------------------------------------------
 // PAYMENT TRACKING
-// Each booking stores its own `payments` array — one entry per amount
-// received (advance, installment, final balance, etc). `amount` on the
-// booking stays the TOTAL package price; how much has actually come in
-// is just the sum of `payments`.
 // -----------------------------------------------------------------------
-
 export async function addPayment(bookingId, existingPayments, payment) {
   const ref = doc(db, "bookings", bookingId);
   const updated = [
@@ -174,5 +236,11 @@ export function totalPaid(payments) {
 }
 
 export async function deleteBooking(bookingId) {
-  return deleteDoc(doc(db, "bookings", bookingId));
+  const ref = doc(db, "bookings", bookingId);
+  const snap = await getDoc(ref);
+  const data = snap.exists() ? snap.data() : null;
+  await deleteDoc(ref);
+  if (data && !data.cancelled) {
+    await bumpBookedDateCount(data.eventDate, -1);
+  }
 }
