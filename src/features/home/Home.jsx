@@ -94,7 +94,7 @@ export default function Home() {
       )}
 
       {/* ---------------- Gallery preview ---------------- */}
-      {previewPhotos.length > 0 && (
+      {/* {previewPhotos.length > 0 && (
         <section className="section">
           <div className="section-head">
             <h2>Recent Work</h2>
@@ -106,7 +106,7 @@ export default function Home() {
             ))}
           </div>
         </section>
-      )}
+      )} */}
 
       {/* ---------------- CTA banner ---------------- */}
       <section className="cta-banner">
