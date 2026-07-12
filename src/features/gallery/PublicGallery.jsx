@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PublicLayout from "../publicLayout/PublicLayout";
 import STATIC_PHOTOS from "./staticPhotos";
 import "./PublicGallery.css";
@@ -24,13 +24,25 @@ export default function PublicGallery() {
   const openLightbox = (idx) => setLightboxIndex(idx);
   const closeLightbox = () => setLightboxIndex(null);
 
-  const showPrev = () => {
+  const showPrev = useCallback(() => {
     setLightboxIndex((prev) => (prev > 0 ? prev - 1 : filtered.length - 1));
-  };
+  }, [filtered.length]);
 
-  const showNext = () => {
+  const showNext = useCallback(() => {
     setLightboxIndex((prev) => (prev < filtered.length - 1 ? prev + 1 : 0));
-  };
+  }, [filtered.length]);
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (lightboxIndex === null) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") showPrev();
+      if (e.key === "ArrowRight") showNext();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [lightboxIndex, showPrev, showNext]);
 
   return (
     <PublicLayout>
@@ -63,7 +75,6 @@ export default function PublicGallery() {
               <video
                 key={idx}
                 src={src}
-                controls
                 className="gallery-video"
                 onClick={() => openLightbox(idx)}
               />
@@ -71,8 +82,9 @@ export default function PublicGallery() {
               <img
                 key={idx}
                 src={src}
-                alt={`${category} ${idx + 1}`}
+                alt={`Gallery item ${idx + 1}`}   // ✅ descriptive alt, no redundant "image/photo"
                 className="gallery-photo"
+                loading="lazy"
                 onClick={() => openLightbox(idx)}
               />
             );
@@ -81,9 +93,9 @@ export default function PublicGallery() {
       </section>
 
       {lightboxIndex !== null && (
-        <div className="gallery-lightbox">
-          <button className="lightbox-close" onClick={closeLightbox}>×</button>
-          <button className="lightbox-prev" onClick={showPrev}>‹</button>
+        <div className="gallery-lightbox" role="dialog" aria-modal="true">
+          <button className="lightbox-close" onClick={closeLightbox} aria-label="Close">×</button>
+          <button className="lightbox-prev" onClick={showPrev} aria-label="Previous">‹</button>
           {filtered[lightboxIndex].endsWith(".mp4") ? (
             <video
               src={filtered[lightboxIndex]}
@@ -94,11 +106,11 @@ export default function PublicGallery() {
           ) : (
             <img
               src={filtered[lightboxIndex]}
-              alt="Enlarged"
+              alt="Gallery item enlarged"   // ✅ descriptive alt
               className="lightbox-image"
             />
           )}
-          <button className="lightbox-next" onClick={showNext}>›</button>
+          <button className="lightbox-next" onClick={showNext} aria-label="Next">›</button>
         </div>
       )}
     </PublicLayout>

@@ -67,6 +67,13 @@
   border-radius: var(--radius-md);
   background: var(--bg-canvas);
 }
+.slick-slide {
+  padding: 0 8px;   /* gap between slides */
+}
+
+.slick-list {
+  margin: 0 -8px;   /* balance out the padding */
+}
 
 .cta-banner {
   background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
@@ -96,8 +103,21 @@
   .hero { padding: 48px 16px; }
   .hero-content h1 { font-size: 24px; }
   .hero-content p { font-size: 14px; }
-  .hero-actions { flex-direction: column; }
-  .hero-actions .btn { width: 100%; }
+  .hero-actions { 
+     flex-direction: column;
+  align-items: center;   /* center buttons instead of stretch */
+  gap: 12px;             /* spacing between buttons */
+  
+  }
+  .hero-actions .btn { 
+   width: 170px;         
+  text-align: center;
+   align-items: center;       /* vertical centering */
+  justify-content: center;  
+  padding: 12px 20px;
+  font-size: 14px;
+  box-sizing: border-box;
+   }
   .quick-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
   .gallery-preview-grid { grid-template-columns: repeat(2, 1fr); }
   .section-head { flex-direction: column; align-items: flex-start; gap: 6px; }

@@ -70,10 +70,16 @@
   cursor: pointer;
 }
 .gallery-video {
-  max-width: 100%;
-  border-radius: 8px;
+  width: 100%;
+  aspect-ratio: 1;       /* same square ratio as photos */
+  object-fit: cover;     /* crop video preview */
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas);
   cursor: pointer;
+  transition: transform 0.15s ease;
 }
+.gallery-video:hover { transform: scale(1.02); }
+
 
 .gallery-lightbox {
   position: fixed;
