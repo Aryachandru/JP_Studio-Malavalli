@@ -1,75 +1,95 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import PublicLayout from "../publicLayout/PublicLayout";
-import { subscribeToPackages, PACKAGE_CATEGORIES } from "./packageService";
-import "./PublicPackages.css";
+import { subscribeToPackages } from "./packageService";
+import { useDialog } from "../../shared/DialogProvider";
+import "./PackageDetail.css";
 
-const TABS = ["All", ...PACKAGE_CATEGORIES];
-
-export default function PublicPackages() {
-  const [packages, setPackages] = useState([]);
+export default function PackageDetail() {
+  const { id } = useParams();
+  const { alertDialog } = useDialog();
+  const navigate = useNavigate();
+  const [pkg, setPkg] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("All");
 
   useEffect(() => {
     const unsub = subscribeToPackages((rows) => {
-      setPackages(rows.filter((p) => p.status === "Active"));
+      const match = rows.find((p) => p.id === id);
+      setPkg(match || null);
       setLoading(false);
     });
     return () => unsub();
-  }, []);
+  }, [id]);
 
-  const filtered = tab === "All" ? packages : packages.filter((p) => p.category === tab);
+  async function handleShare() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: pkg?.name, url });
+      } catch {
+        // user cancelled share — no-op
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      await alertDialog("Link copied to clipboard!", { tone: "success" });
+    }
+  }
+
+  if (loading) {
+    return (
+      <PublicLayout>
+        <div className="loading-line">Loading package…</div>
+      </PublicLayout>
+    );
+  }
+
+  if (!pkg) {
+    return (
+      <PublicLayout>
+        <section className="section" style={{ textAlign: "center" }}>
+          <h2>Package not found</h2>
+          <p style={{ color: "var(--ink-400)", marginBottom: 16 }}>
+            This package may have been removed or renamed.
+          </p>
+          <Link to="/packages" className="btn btn-gold">Browse All Packages</Link>
+        </section>
+      </PublicLayout>
+    );
+  }
 
   return (
     <PublicLayout>
-      <section className="page-header">
-        <h1>Our Packages</h1>
-        <p>Pick the package that fits your celebration — every one is customizable on request.</p>
-      </section>
-
-      <section className="section">
-        <div className="tab-row public-package-tabs">
-          {TABS.map((t) => (
-            <button key={t} className={`tab-pill${tab === t ? " active" : ""}`} onClick={() => setTab(t)}>
-              {t}
-            </button>
-          ))}
+      <section className="section package-detail-section">
+        <div className="package-detail-top">
+          <button className="btn btn-ghost" onClick={() => navigate("/packages")}>← Back</button>
+          <button className="btn btn-ghost" onClick={handleShare}>🔗 Share</button>
         </div>
 
-        {loading && <div className="loading-line">Loading packages…</div>}
-        {!loading && filtered.length === 0 && (
-          <div className="empty-state">No packages in this category yet — please check back soon.</div>
-        )}
+        <div className="card package-detail-card">
+          <div
+            className="package-detail-hero"
+            style={{ backgroundImage: pkg.imageUrl ? `url(${pkg.imageUrl})` : undefined }}
+          />
+          <span className="package-detail-category">{pkg.category}</span>
+          <h1>{pkg.name}</h1>
+          <div className="package-detail-price">₹{Number(pkg.price).toLocaleString("en-IN")}</div>
 
-        <div className="grid grid-3 public-package-grid">
-          {filtered.map((p) => (
-            <div key={p.id} className="card public-package-card">
-              <div
-                className="public-package-thumb"
-                style={{ backgroundImage: p.imageUrl ? `url(${p.imageUrl})` : undefined }}
-              />
-              <span className="public-package-category">{p.category}</span>
-              <h3>{p.name}</h3>
-              <div className="public-package-price">₹{Number(p.price).toLocaleString("en-IN")}</div>
-              {p.description && <p className="public-package-desc">{p.description}</p>}
+          {pkg.description && <p className="package-detail-desc">{pkg.description}</p>}
 
-              {p.inclusions && p.inclusions.length > 0 && (
-                <ul className="public-package-inclusions">
-                  {p.inclusions.map((inc, i) => (
-                    <li key={i}>✓ {inc}</li>
-                  ))}
-                </ul>
-              )}
+          {pkg.inclusions && pkg.inclusions.length > 0 && (
+            <>
+              <h3 className="package-detail-subhead">What's Included</h3>
+              <ul className="package-detail-inclusions">
+                {pkg.inclusions.map((inc, i) => (
+                  <li key={i}>✓ {inc}</li>
+                ))}
+              </ul>
+            </>
+          )}
 
-              <Link to={`/book?package=${encodeURIComponent(p.name)}`} className="btn btn-gold btn-block">
-                Book This Package
-              </Link>
-              <Link to={`/packages/${p.id}`} className="btn btn-ghost btn-block public-package-view-details">
-                View Details
-              </Link>
-            </div>
-          ))}
+          <Link to={`/book?package=${encodeURIComponent(pkg.name)}`} className="btn btn-gold btn-block package-detail-cta">
+            Book This Package
+          </Link>
         </div>
       </section>
     </PublicLayout>

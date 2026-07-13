@@ -1,0 +1,66 @@
+/* DialogProvider.css — src/shared/DialogProvider.jsx only */
+
+.dlg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 18, 30, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.dlg-panel {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 360px;
+  width: 100%;
+  padding: 26px 24px 22px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(20, 24, 40, 0.25);
+  font-family: "Inter", "Poppins", sans-serif;
+}
+
+.dlg-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 auto 14px;
+}
+.dlg-icon-info { background: #e8eefc; color: #3b5fe0; }
+.dlg-icon-success { background: #e6f4ea; color: #1e8e3e; }
+.dlg-icon-warning { background: #fff4e0; color: #c9791a; }
+.dlg-icon-error { background: #fdeaea; color: #d93025; }
+
+.dlg-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #1c1f2a; }
+.dlg-message {
+  font-size: 13.5px;
+  color: #5b6072;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  white-space: pre-line;
+}
+
+.dlg-actions { display: flex; gap: 10px; }
+.dlg-btn {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.dlg-btn-primary { background: linear-gradient(135deg, #cf8a1d, #b97815); color: #fff; }
+.dlg-btn-danger { background: #d93025; color: #fff; }
+.dlg-btn-ghost { background: #f4f5f9; color: #5b6072; }
+
+@media (max-width: 420px) {
+  .dlg-panel { padding: 22px 18px 18px; }
+}

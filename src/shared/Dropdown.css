@@ -1,0 +1,74 @@
+/* Dropdown.css — src/shared/Dropdown.jsx only.
+   Uses the app's global design tokens (variables.css) with safe
+   fallbacks, so it looks right whether it's dropped into an admin page,
+   a public page, or inside the Developer page's own purple-scoped modal. */
+
+.dd-wrap {
+  position: relative;
+  width: 100%;
+}
+.dd-wrap.disabled { opacity: 0.6; pointer-events: none; }
+
+.dd-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--border, #ecedf2);
+  border-radius: var(--radius-sm, 8px);
+  background: #fbfbfd;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  color: var(--ink-900, #1c1f2a);
+}
+.dd-trigger:hover { border-color: var(--gold-500, #cf8a1d); }
+.dd-trigger.open { border-color: var(--gold-500, #cf8a1d); background: #fff; }
+
+.dd-placeholder { color: var(--ink-400, #8b90a0); }
+.dd-value { color: var(--ink-900, #1c1f2a); font-weight: 500; }
+
+.dd-chevron {
+  font-size: 10px;
+  color: var(--ink-400, #8b90a0);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.dd-trigger.open .dd-chevron { transform: rotate(180deg); }
+
+.dd-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--border, #ecedf2);
+  border-radius: var(--radius-sm, 8px);
+  box-shadow: 0 12px 28px rgba(20, 24, 40, 0.16);
+  max-height: 240px;
+  overflow-y: auto;
+  z-index: 80;
+  padding: 6px;
+}
+
+.dd-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  cursor: pointer;
+  color: var(--ink-900, #1c1f2a);
+}
+.dd-option:hover { background: var(--gold-050, #fdf1de); }
+.dd-option.selected { background: var(--gold-050, #fdf1de); color: var(--gold-600, #b97815); font-weight: 600; }
+.dd-check { color: var(--gold-600, #b97815); font-size: 12px; flex-shrink: 0; }
+
+@media (max-width: 480px) {
+  .dd-trigger { padding: 10px 12px; font-size: 13.5px; }
+}

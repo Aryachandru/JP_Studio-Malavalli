@@ -8,6 +8,8 @@ import {
   togglePackageStatus,
   PACKAGE_CATEGORIES,
 } from "./packageService";
+import { useDialog } from "../../shared/DialogProvider";
+import Dropdown from "../../shared/Dropdown";
 import "./AdminPackages.css";
 
 const EMPTY_FORM = {
@@ -21,6 +23,7 @@ const EMPTY_FORM = {
 };
 
 export default function Packages() {
+  const { alertDialog, confirmDialog } = useDialog();
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -63,7 +66,7 @@ export default function Packages() {
 
   async function handleSave() {
     if (!form.name || !form.price) {
-      alert("Package name and price are required.");
+      await alertDialog("Package name and price are required.");
       return;
     }
     const payload = {
@@ -84,7 +87,9 @@ export default function Packages() {
   }
 
   async function handleDelete(id) {
-    if (window.confirm("Delete this package?")) await deletePackage(id);
+    if (await confirmDialog("Delete this package?", { tone: "warning", confirmLabel: "Delete" })) {
+      await deletePackage(id);
+    }
   }
 
   return (
@@ -105,11 +110,11 @@ export default function Packages() {
             </div>
             <div className="field">
               <label>Event Category</label>
-              <select value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}>
-                {PACKAGE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+              <Dropdown
+                options={PACKAGE_CATEGORIES}
+                value={form.category}
+                onChange={(v) => setForm((f) => ({ ...f, category: v }))}
+              />
               <p className="field-hint">This decides which tab/dropdown this package shows up under on the public site.</p>
             </div>
             <div className="field">
@@ -118,10 +123,11 @@ export default function Packages() {
             </div>
             <div className="field">
               <label>Status</label>
-              <select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}>
-                <option>Active</option>
-                <option>Inactive</option>
-              </select>
+              <Dropdown
+                options={["Active", "Inactive"]}
+                value={form.status}
+                onChange={(v) => setForm((f) => ({ ...f, status: v }))}
+              />
             </div>
             <div className="field">
               <label>Image URL (Optional)</label>

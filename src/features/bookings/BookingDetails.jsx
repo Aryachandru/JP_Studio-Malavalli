@@ -13,11 +13,14 @@ import {
 } from "./bookingService";
 import { markCustomerBookingCompleted } from "../customers/customerService";
 import { STAGES, getTopLevelStatus, stageStatusOf } from "../../shared/statuses";
+import { useDialog } from "../../shared/DialogProvider";
+import Dropdown from "../../shared/Dropdown";
 import "./BookingDetails.css";
 
 const TABS = ["Details", "Status Timeline", "Payments", "Notes"];
 
 export default function BookingDetails() {
+  const { alertDialog, confirmDialog } = useDialog();
   const { id } = useParams();
   const navigate = useNavigate();
   const [booking, setBooking] = useState(null);
@@ -83,14 +86,14 @@ export default function BookingDetails() {
   }
 
   async function handleCancel() {
-    if (window.confirm("Cancel this booking? This cannot be undone from here.")) {
+    if (await confirmDialog("Cancel this booking? This cannot be undone from here.", { tone: "warning", confirmLabel: "Cancel Booking" })) {
       await cancelBooking(id);
     }
   }
 
   async function handleAddPayment() {
     if (!paymentAmount || Number(paymentAmount) <= 0) {
-      alert("Enter a payment amount greater than 0.");
+      await alertDialog("Enter a payment amount greater than 0.");
       return;
     }
     setSavingPayment(true);
@@ -108,7 +111,7 @@ export default function BookingDetails() {
   }
 
   async function handleRemovePayment(index) {
-    if (window.confirm("Remove this payment entry?")) {
+    if (await confirmDialog("Remove this payment entry?", { tone: "warning", confirmLabel: "Remove" })) {
       await removePayment(id, booking.payments, index);
     }
   }
@@ -251,13 +254,11 @@ export default function BookingDetails() {
                   </div>
                   <div className="field">
                     <label>Method</label>
-                    <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                      <option>Cash</option>
-                      <option>UPI</option>
-                      <option>Bank Transfer</option>
-                      <option>Card</option>
-                      <option>Other</option>
-                    </select>
+                    <Dropdown
+                      options={["Cash", "UPI", "Bank Transfer", "Card", "Other"]}
+                      value={paymentMethod}
+                      onChange={setPaymentMethod}
+                    />
                   </div>
                 </div>
                 <div className="field">
@@ -310,13 +311,7 @@ export default function BookingDetails() {
           <h3 style={{ marginBottom: 14 }}>Update Status</h3>
           <div className="field">
             <label>Update Status To</label>
-            <select value={nextStage} onChange={(e) => setNextStage(e.target.value)}>
-              {STAGES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
+            <Dropdown options={STAGES} value={nextStage} onChange={setNextStage} />
           </div>
           <button className="btn btn-gold btn-block" onClick={handleUpdateStatus} disabled={saving}>
             {saving ? "Updating…" : "Update Status"}

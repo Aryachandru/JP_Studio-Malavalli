@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../adminShell/Layout";
 import { subscribeToOffers, createOffer, updateOffer, deleteOffer, toggleOfferActive } from "./offerService";
+import { useDialog } from "../../shared/DialogProvider";
 import "./AdminOffers.css";
 
 const EMPTY_FORM = { title: "", message: "", active: true };
 
 export default function AdminOffers() {
+  const { alertDialog, confirmDialog } = useDialog();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -34,7 +36,7 @@ export default function AdminOffers() {
 
   async function handleSave() {
     if (!form.title || !form.message) {
-      alert("Please fill in both a title and message.");
+      await alertDialog("Please fill in both a title and message.");
       return;
     }
     if (editingId) {
@@ -46,7 +48,9 @@ export default function AdminOffers() {
   }
 
   async function handleDelete(id) {
-    if (window.confirm("Delete this offer?")) await deleteOffer(id);
+    if (await confirmDialog("Delete this offer?", { tone: "warning", confirmLabel: "Delete" })) {
+      await deleteOffer(id);
+    }
   }
 
   return (

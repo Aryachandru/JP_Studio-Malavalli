@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Layout from "../adminShell/Layout";
 import { subscribeToSettings, saveSettings } from "./settingsService";
+import { uploadImageFile } from "../../shared/uploadImage";
+import { useDialog } from "../../shared/DialogProvider";
 import "./Settings.css";
 
 export default function Settings() {
+  const { alertDialog } = useDialog();
   const [form, setForm] = useState({
     studioName: "JP Studio",
     ownerName: "",
@@ -13,16 +16,19 @@ export default function Settings() {
     instagram: "",
     facebook: "",
     whatsapp: "",
-    youtube: "",
     googleMapsUrl: "",
     googleMapsEmbedUrl: "",
+    heroImages: [],
+    youtubeUrl: "",
   });
   const [saving, setSaving] = useState(false);
+  const [uploadingHero, setUploadingHero] = useState(false);
   const [activePanel, setActivePanel] = useState(null);
+  const heroFileRef = useRef(null);
 
   useEffect(() => {
     const unsub = subscribeToSettings((data) => {
-      if (data) setForm((f) => ({ ...f, ...data }));
+      if (data) setForm((f) => ({ ...f, ...data, heroImages: data.heroImages || (data.heroImageUrl ? [data.heroImageUrl] : []) }));
     });
     return () => unsub();
   }, []);
@@ -38,8 +44,34 @@ export default function Settings() {
     setActivePanel(null);
   }
 
+  async function handleHeroFiles(e) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+    setUploadingHero(true);
+    try {
+      const urls = await Promise.all(files.map((file) => uploadImageFile(file, "hero")));
+      setForm((f) => ({ ...f, heroImages: [...(f.heroImages || []), ...urls] }));
+    } catch (err) {
+      await alertDialog(
+        "Upload failed: " + err.message +
+        "\n\nIf this says something about permissions or a missing bucket, your Firebase project " +
+        "likely needs to be upgraded to the Blaze plan — Storage no longer works on the free Spark plan.",
+        { tone: "error" }
+      );
+    } finally {
+      setUploadingHero(false);
+      e.target.value = "";
+    }
+  }
+
+  function removeHeroImage(idx) {
+    setForm((f) => ({ ...f, heroImages: f.heroImages.filter((_, i) => i !== idx) }));
+  }
+
   const studioItems = [
     { key: "profile", icon: "👤", label: "Studio Profile" },
+    { key: "banner", icon: "🖼️", label: "Homepage Banner Images" },
+    { key: "video", icon: "▶️", label: "YouTube Video" },
     { key: "contact", icon: "📞", label: "Contact Information" },
     { key: "social", icon: "🔗", label: "Social Media Links" },
     { key: "location", icon: "📍", label: "Location & Google Maps" },
@@ -91,14 +123,55 @@ export default function Settings() {
                 <label>Address</label>
                 <textarea rows={2} value={form.address} onChange={(e) => update("address", e.target.value)} />
               </div>
+            </>
+          )}
+
+          {activePanel === "banner" && (
+            <>
+              <p className="settings-help-text">
+                Add as many photos as you like — the homepage will show them as a rotating slideshow.
+                Reorder isn't supported yet; delete and re-add if you need a different order.
+              </p>
+              <input
+                ref={heroFileRef}
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                onChange={handleHeroFiles}
+              />
+              <button className="btn btn-outline" onClick={() => heroFileRef.current.click()} disabled={uploadingHero}>
+                {uploadingHero ? "Uploading…" : "📎 Attach Photos From Device"}
+              </button>
+
+              <div className="hero-image-grid">
+                {(form.heroImages || []).map((url, idx) => (
+                  <div key={idx} className="hero-image-thumb-wrap">
+                    <img src={url} alt={`Banner ${idx + 1}`} className="hero-image-thumb" />
+                    <button className="hero-image-remove" onClick={() => removeHeroImage(idx)}>✕</button>
+                  </div>
+                ))}
+                {(form.heroImages || []).length === 0 && (
+                  <div className="empty-state" style={{ padding: "24px 0" }}>No banner images yet.</div>
+                )}
+              </div>
+            </>
+          )}
+
+          {activePanel === "video" && (
+            <>
               <div className="field">
-                <label>Homepage Banner Image URL</label>
+                <label>YouTube Video URL</label>
                 <input
-                  value={form.heroImageUrl || ""}
-                  onChange={(e) => update("heroImageUrl", e.target.value)}
-                  placeholder="https://…  (shown behind the headline on your homepage)"
+                  value={form.youtubeUrl || ""}
+                  onChange={(e) => update("youtubeUrl", e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=…  or  https://youtu.be/…"
                 />
               </div>
+              <p className="settings-help-text">
+                Paste a normal YouTube link (watch or share link, either works) — a studio intro/highlight
+                reel plays embedded on your homepage. Leave blank to hide that section entirely.
+              </p>
             </>
           )}
 
@@ -129,15 +202,6 @@ export default function Settings() {
                 <label>WhatsApp Number</label>
                 <input value={form.whatsapp} onChange={(e) => update("whatsapp", e.target.value)} placeholder="+91…" />
               </div>
-              <div className="field">
-  <label>YouTube</label>
-  <input
-    value={form.youtube}
-    onChange={(e) => update("youtube", e.target.value)}
-    placeholder="https://youtube.com/..."
-  />
-</div>
-
             </>
           )}
 
@@ -159,7 +223,7 @@ export default function Settings() {
                   placeholder="https://www.google.com/maps/embed?pb=…"
                 />
               </div>
-              <p style={{ color: "var(--ink-400)", fontSize: 12 }}>
+              <p className="settings-help-text">
                 Get the embed link from Google Maps → Share → Embed a map → copy the URL
                 inside <code>src="..."</code>.
               </p>
@@ -167,7 +231,7 @@ export default function Settings() {
           )}
 
           {(activePanel === "payment" || activePanel === "notifications") && (
-            <p style={{ color: "var(--ink-400)", fontSize: 13 }}>
+            <p className="settings-help-text">
               Wire this panel up to your payment gateway or notification provider config.
             </p>
           )}

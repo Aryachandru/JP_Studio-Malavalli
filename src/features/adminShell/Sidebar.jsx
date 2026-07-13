@@ -1,11 +1,9 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../auth/auth";
+import { useDialog } from "../../shared/DialogProvider";
 import "./Sidebar.css";
 
-// Every sidebar entry routes directly to its real page (as requested) —
-// react-router's NavLink handles the "active" highlight automatically,
-// so whichever page is open, the matching sidebar item lights up gold.
 const NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", icon: "🏠", end: true },
   { to: "/admin/bookings", label: "Bookings", icon: "📖" },
@@ -20,10 +18,11 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar({ open, onClose }) {
+  const { confirmDialog } = useDialog();
   const navigate = useNavigate();
 
   async function handleLogout() {
-    if (window.confirm("Log out of JP Studio Admin?")) {
+    if (await confirmDialog("Log out of JP Studio Admin?", { confirmLabel: "Log Out" })) {
       await logout();
       navigate("/admin/login");
     }
@@ -38,7 +37,6 @@ export default function Sidebar({ open, onClose }) {
           <span>ADMIN PANEL</span>
         </div>
         <a href="/" className="sidebar-view-site" title="View public site">🌐</a>
-        {/* Only visible on mobile/tablet drawer mode (see Sidebar.css) */}
         <button className="sidebar-close-btn" onClick={onClose} aria-label="Close menu">
           ✕
         </button>

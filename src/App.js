@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { DialogProvider } from "./shared/DialogProvider";
 
 import PrivateRoute from "./features/auth/PrivateRoute";
 import AdminLogin from "./features/auth/AdminLogin";
@@ -36,7 +37,9 @@ import Developer from "./features/developer/Developer";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <DialogProvider>
+
+ <BrowserRouter>
       <Routes>
         {/* ---------------- Public site ---------------- */}
         <Route path="/" element={<Home />} />
@@ -71,5 +74,8 @@ export default function App() {
         <Route path="*" element={<Home />} />
       </Routes>
     </BrowserRouter>
+
+    </DialogProvider>
+   
   );
 }
