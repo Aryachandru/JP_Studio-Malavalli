@@ -122,3 +122,18 @@
   .gallery-preview-grid { grid-template-columns: repeat(2, 1fr); }
   .section-head { flex-direction: column; align-items: flex-start; gap: 6px; }
 }
+.gallery-preview-photo-wrap {
+  position: relative;
+  display: block;
+}
+.gallery-preview-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 20px;
+  background: rgba(15, 18, 30, 0.3);
+  border-radius: var(--radius-md);
+}

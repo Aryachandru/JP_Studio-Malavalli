@@ -17,7 +17,7 @@ import { useDialog } from "../../shared/DialogProvider";
 import Dropdown from "../../shared/Dropdown";
 import "./BookingDetails.css";
 
-const TABS = ["Details", "Status Timeline", "Payments", "Notes"];
+const TABS = ["Details", "Status Timeline", "Payments", "Photo Links", "Notes"];
 
 export default function BookingDetails() {
   const { alertDialog, confirmDialog } = useDialog();
@@ -34,12 +34,17 @@ export default function BookingDetails() {
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [paymentNote, setPaymentNote] = useState("");
   const [savingPayment, setSavingPayment] = useState(false);
+  const [photoSelectionLink, setPhotoSelectionLink] = useState("");
+  const [deliveryLink, setDeliveryLink] = useState("");
+  const [savingLinks, setSavingLinks] = useState(false);
 
   useEffect(() => {
     const unsub = subscribeToBooking(id, (data) => {
       setBooking(data);
       if (data) {
         setForm(data);
+        setPhotoSelectionLink(data.photoSelectionLink || "");
+        setDeliveryLink(data.deliveryLink || "");
         const idx = Math.min((data.stageIndex ?? 0) + 1, STAGES.length - 1);
         setNextStage(STAGES[idx]);
       }
@@ -116,6 +121,19 @@ export default function BookingDetails() {
     }
   }
 
+  async function handleSaveLinks() {
+    setSavingLinks(true);
+    try {
+      await updateBooking(id, {
+        photoSelectionLink: photoSelectionLink.trim(),
+        deliveryLink: deliveryLink.trim(),
+      });
+      await alertDialog("Links saved — the customer will see these on their Track Booking page.", { tone: "success" });
+    } finally {
+      setSavingLinks(false);
+    }
+  }
+
   return (
     <Layout title="Booking Details">
       <div className="card booking-header-card">
@@ -146,6 +164,7 @@ export default function BookingDetails() {
       </div>
 
       <div className="grid grid-2 booking-details-grid">
+        {/* LEFT: tab content */}
         <div className="card">
           {tab === "Details" && (
             <>
@@ -276,6 +295,53 @@ export default function BookingDetails() {
             </>
           )}
 
+          {tab === "Photo Links" && (
+            <>
+              <h3 style={{ marginBottom: 6 }}>Photo Links</h3>
+              <p className="photo-links-intro">
+                Paste a Google Drive (or any) folder link here instead of uploading individual photos —
+                customers get one link to browse and download at their own pace, on their own device,
+                without straining anyone's storage. Whatever you save here shows up immediately on the
+                customer's Track Booking page.
+              </p>
+
+              <div className="field">
+                <label>
+                  📸 Photo Selection Link
+                  {photoSelectionLink && <span className="photo-link-status added">Added</span>}
+                </label>
+                <input
+                  placeholder="https://drive.google.com/drive/folders/…"
+                  value={photoSelectionLink}
+                  onChange={(e) => setPhotoSelectionLink(e.target.value)}
+                />
+                <p className="photo-links-hint">
+                  Share this once raw/proof photos are ready for the customer to pick their favorites.
+                </p>
+              </div>
+
+              <div className="field">
+                <label>
+                  🎉 Final Delivery Link
+                  {deliveryLink && <span className="photo-link-status added">Added</span>}
+                </label>
+                <input
+                  placeholder="https://drive.google.com/drive/folders/…"
+                  value={deliveryLink}
+                  onChange={(e) => setDeliveryLink(e.target.value)}
+                />
+                <p className="photo-links-hint">
+                  Share this once final edited photos are ready — typically when you move this booking to
+                  "Ready for Delivery".
+                </p>
+              </div>
+
+              <button className="btn btn-gold" onClick={handleSaveLinks} disabled={savingLinks}>
+                {savingLinks ? "Saving…" : "Save Links"}
+              </button>
+            </>
+          )}
+
           {tab === "Notes" && (
             <>
               <h3 style={{ marginBottom: 14 }}>Internal Notes</h3>
@@ -307,6 +373,7 @@ export default function BookingDetails() {
           )}
         </div>
 
+        {/* RIGHT: Update status panel */}
         <div className="card">
           <h3 style={{ marginBottom: 14 }}>Update Status</h3>
           <div className="field">

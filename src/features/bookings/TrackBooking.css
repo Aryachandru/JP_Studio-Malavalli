@@ -101,3 +101,46 @@
 @media (max-width: 480px) {
   .track-result-head { flex-direction: column; gap: 10px; }
 }
+/* ---------------- Photo links (Photo Selection / Final Delivery) ---------------- */
+.photo-links-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.photo-link-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--gold-050);
+  border: 1px solid #f0dcb5;
+  color: var(--ink-900);
+}
+.photo-link-card:hover { filter: brightness(0.98); }
+.photo-link-card.ready {
+  background: var(--green-bg);
+  border-color: #b7e0c1;
+}
+
+.photo-link-icon { font-size: 22px; flex-shrink: 0; }
+
+.photo-link-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.photo-link-text strong { font-size: 14px; }
+.photo-link-text span { font-size: 12px; color: var(--ink-600); }
+
+.photo-link-arrow { font-size: 16px; color: var(--ink-400); flex-shrink: 0; }
+
+@media (max-width: 480px) {
+  .photo-link-card { padding: 12px 14px; gap: 10px; }
+  .photo-link-icon { font-size: 18px; }
+}

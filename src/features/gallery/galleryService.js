@@ -1,42 +1,47 @@
-// src/firebase/galleryService.js
+// src/features/gallery/galleryService.js
 import {
   collection,
+  doc,
   addDoc,
   deleteDoc,
-  doc,
   onSnapshot,
   query,
   orderBy,
   serverTimestamp,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase/config";
+import { db } from "../../firebase/config";
 
 const galleryCol = collection(db, "galleryPhotos");
 
+// The assignable categories for a gallery item (distinct from "All
+// Photos", which is a filter-only option on the public page, not a real
+// category anything gets tagged with).
+export const GALLERY_CATEGORIES = ["Wedding", "Pre Wedding", "Baby Shoot", "Birthday", "Maternity"];
+
 export function subscribeToGallery(callback) {
-  const q = query(galleryCol, orderBy("uploadedAt", "desc"));
+  const q = query(galleryCol, orderBy("addedAt", "desc"));
   return onSnapshot(q, (snap) => {
     callback(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
   });
 }
 
-// Uploads a File object to Firebase Storage, then writes a Firestore
-// record pointing at it so it shows up live in the Gallery grid.
-export async function uploadGalleryPhoto(file, category) {
-  const path = `gallery/${category}/${Date.now()}-${file.name}`;
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  const url = await getDownloadURL(storageRef);
-
+// Adds a gallery item by URL — no file upload, no Firebase Storage
+// involved at all. This means gallery management works regardless of
+// whether your Firebase project is on the Spark or Blaze plan, unlike
+// the old device-upload flow which needed Storage (Blaze-only as of
+// Feb 2026).
+// `mediaType` is "image" or "video". For video, `url` can be either a
+// YouTube link (any shape) or a direct video file URL (.mp4 etc) — both
+// are handled automatically wherever this is displayed.
+export async function addGalleryItem({ url, category, mediaType = "image" }) {
   return addDoc(galleryCol, {
-    url,
+    url: url.trim(),
     category,
-    fileName: file.name,
-    uploadedAt: serverTimestamp(),
+    mediaType,
+    addedAt: serverTimestamp(),
   });
 }
 
-export async function deleteGalleryPhoto(id) {
+export async function deleteGalleryItem(id) {
   return deleteDoc(doc(db, "galleryPhotos", id));
 }

@@ -1,76 +1,120 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../adminShell/Layout";
-import { subscribeToGallery, uploadGalleryPhoto, deleteGalleryPhoto } from "./galleryService";
+import { subscribeToGallery, addGalleryItem, deleteGalleryItem, GALLERY_CATEGORIES } from "./galleryService";
+import { getYouTubeThumbnail } from "../../shared/youtube";
+import { useDialog } from "../../shared/DialogProvider";
+import Dropdown from "../../shared/Dropdown";
 import "./AdminGallery.css";
 
-const CATEGORIES = ["All Photos", "Wedding", "Pre Wedding", "Baby Shoot", "Birthday", "Maternity"];
+const FILTER_TABS = ["All Photos", ...GALLERY_CATEGORIES];
 
 export default function Gallery() {
-  const [photos, setPhotos] = useState([]);
+  const { alertDialog, confirmDialog } = useDialog();
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState("All Photos");
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef(null);
+  const [filterCategory, setFilterCategory] = useState("All Photos");
+
+  const [formCategory, setFormCategory] = useState(GALLERY_CATEGORIES[0]);
+  const [mediaType, setMediaType] = useState("image");
+  const [urlInput, setUrlInput] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const unsub = subscribeToGallery((rows) => {
-      setPhotos(rows);
+      setItems(rows);
       setLoading(false);
     });
     return () => unsub();
   }, []);
 
-  const filtered = category === "All Photos" ? photos : photos.filter((p) => p.category === category);
+  const filtered = filterCategory === "All Photos" ? items : items.filter((p) => p.category === filterCategory);
 
-  async function handleFiles(e) {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-    setUploading(true);
+  async function handleAdd() {
+    if (!urlInput.trim()) {
+      await alertDialog("Please paste an image or video URL first.");
+      return;
+    }
+    setSaving(true);
     try {
-      const targetCategory = category === "All Photos" ? "Wedding" : category;
-      await Promise.all(files.map((file) => uploadGalleryPhoto(file, targetCategory)));
+      await addGalleryItem({ url: urlInput, category: formCategory, mediaType });
+      setUrlInput("");
     } catch (err) {
-      alert("Upload failed: " + err.message);
+      await alertDialog("Couldn't add that item: " + err.message, { tone: "error" });
     } finally {
-      setUploading(false);
-      e.target.value = "";
+      setSaving(false);
     }
   }
 
   async function handleDelete(id) {
-    if (window.confirm("Delete this photo?")) await deleteGalleryPhoto(id);
+    if (await confirmDialog("Remove this item from the gallery?", { tone: "warning", confirmLabel: "Remove" })) {
+      await deleteGalleryItem(id);
+    }
   }
 
   return (
     <Layout title="Gallery">
-      <div className="gallery-toolbar">
-        <div className="tab-row" style={{ marginBottom: 0 }}>
-          {CATEGORIES.map((c) => (
-            <button key={c} className={`tab-pill${category === c ? " active" : ""}`} onClick={() => setCategory(c)}>
-              {c}
-            </button>
-          ))}
+      <div className="card gallery-add-card">
+        <h3 style={{ marginBottom: 4 }}>Add to Gallery</h3>
+        <p className="gallery-add-hint">
+          Paste a link to an image or video (a YouTube link works for video, or a direct file URL) — no upload needed.
+        </p>
+
+        <div className="grid grid-3 gallery-add-grid">
+          <div className="field">
+            <label>Category</label>
+            <Dropdown options={GALLERY_CATEGORIES} value={formCategory} onChange={setFormCategory} />
+          </div>
+          <div className="field">
+            <label>Type</label>
+            <Dropdown
+              options={[{ value: "image", label: "Image" }, { value: "video", label: "Video" }]}
+              value={mediaType}
+              onChange={setMediaType}
+            />
+          </div>
+          <div className="field">
+            <label>{mediaType === "video" ? "Video URL (YouTube or direct file)" : "Image URL"}</label>
+            <input
+              placeholder={mediaType === "video" ? "https://youtube.com/watch?v=… or https://…/video.mp4" : "https://…/photo.jpg"}
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+            />
+          </div>
         </div>
-        <div>
-          <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleFiles} />
-          <button className="btn btn-gold" onClick={() => fileInputRef.current.click()} disabled={uploading}>
-            {uploading ? "Uploading…" : "⬆ Upload Photos"}
+
+        <button className="btn btn-gold" onClick={handleAdd} disabled={saving}>
+          {saving ? "Adding…" : "+ Add to Gallery"}
+        </button>
+      </div>
+
+      <div className="tab-row" style={{ marginTop: 22 }}>
+        {FILTER_TABS.map((c) => (
+          <button key={c} className={`tab-pill${filterCategory === c ? " active" : ""}`} onClick={() => setFilterCategory(c)}>
+            {c}
           </button>
-        </div>
+        ))}
       </div>
 
       {loading && <div className="loading-line">Loading gallery…</div>}
-      {!loading && filtered.length === 0 && <div className="empty-state">No photos in this category yet.</div>}
+      {!loading && filtered.length === 0 && <div className="empty-state">No items in this category yet.</div>}
 
       <div className="gallery-grid">
-        {filtered.map((p) => (
-          <div key={p.id} className="gallery-photo-wrap">
-            <img src={p.url} alt={p.fileName || "Studio photo"} className="gallery-photo" />
-            <button className="gallery-delete-btn" onClick={() => handleDelete(p.id)}>
-              🗑️
-            </button>
-          </div>
-        ))}
+        {filtered.map((p) => {
+          const thumbSrc = p.mediaType === "video" ? getYouTubeThumbnail(p.url) : p.url;
+          return (
+            <div key={p.id} className="gallery-photo-wrap">
+              {thumbSrc ? (
+                <img src={thumbSrc} alt="Gallery item" className="gallery-photo" />
+              ) : (
+                <div className="gallery-photo gallery-video-placeholder">🎬</div>
+              )}
+              {p.mediaType === "video" && <span className="gallery-video-badge">▶ Video</span>}
+              <button className="gallery-delete-btn" onClick={() => handleDelete(p.id)}>
+                🗑️
+              </button>
+            </div>
+          );
+        })}
       </div>
     </Layout>
   );
