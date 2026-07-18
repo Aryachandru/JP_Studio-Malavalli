@@ -4,12 +4,16 @@ import { logout } from "../auth/auth";
 import { useDialog } from "../../shared/DialogProvider";
 import "./Sidebar.css";
 
+// Every sidebar entry routes directly to its real page (as requested) —
+// react-router's NavLink handles the "active" highlight automatically,
+// so whichever page is open, the matching sidebar item lights up gold.
 const NAV_ITEMS = [
   { to: "/admin", label: "Dashboard", icon: "🏠", end: true },
   { to: "/admin/bookings", label: "Bookings", icon: "📖" },
   { to: "/admin/calendar", label: "Calendar", icon: "📅" },
   { to: "/admin/packages", label: "Packages", icon: "📦" },
   { to: "/admin/offers", label: "Offers", icon: "🎉" },
+  { to: "/admin/testimonials", label: "Testimonials", icon: "⭐" },
   { to: "/admin/clients", label: "Clients", icon: "👥" },
   { to: "/admin/gallery", label: "Gallery", icon: "🖼️" },
   { to: "/admin/photographers", label: "Photographers", icon: "📷" },
@@ -37,6 +41,7 @@ export default function Sidebar({ open, onClose }) {
           <span>ADMIN PANEL</span>
         </div>
         <a href="/" className="sidebar-view-site" title="View public site">🌐</a>
+        {/* Only visible on mobile/tablet drawer mode (see Sidebar.css) */}
         <button className="sidebar-close-btn" onClick={onClose} aria-label="Close menu">
           ✕
         </button>

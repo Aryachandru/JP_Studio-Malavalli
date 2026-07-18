@@ -67,6 +67,33 @@
   border-radius: var(--radius-md);
   background: var(--bg-canvas);
 }
+.video-preview-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--navy-900);
+}
+.video-preview-thumb {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  display: block;
+}
+.video-preview-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 24px;
+  background: rgba(15, 18, 30, 0.35);
+}
 .slick-slide {
   padding: 0 8px;   /* gap between slides */
 }

@@ -27,10 +27,11 @@ export function getYouTubeEmbedUrl(url) {
   return id ? `https://www.youtube.com/embed/${id}` : null;
 }
 
-// hqdefault.jpg exists for every YouTube video ever uploaded (unlike
-// maxresdefault, which not all videos have), so it's the safe default
-// to use for thumbnails.
-export function getYouTubeThumbnail(url) {
+// mqdefault.jpg (320x180) is roughly a third the file size of hqdefault.jpg
+// (480x360) and loads noticeably faster in grids/carousels where the
+// thumbnail is small anyway — use "hq" only where the thumbnail is shown
+// large (e.g. a bigger hero-style preview).
+export function getYouTubeThumbnail(url, quality = "mq") {
   const id = getYouTubeId(url);
-  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
+  return id ? `https://img.youtube.com/vi/${id}/${quality}default.jpg` : null;
 }

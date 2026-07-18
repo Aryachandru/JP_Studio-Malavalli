@@ -25,12 +25,19 @@
   list-style: none;
   padding: 0;
   margin: 0 0 16px;
-  flex: 1;
 }
 .public-package-inclusions li {
   font-size: 13px;
   color: var(--ink-700, var(--ink-900));
   margin-bottom: 6px;
+}
+
+/* Pins the CTA buttons to the bottom of every card, regardless of how
+   much (or how little) description/inclusions content sits above them —
+   this is what keeps the "Book This Package" row aligned across a whole
+   grid row even when some cards have no description and others do. */
+.public-package-card .btn-gold {
+  margin-top: auto;
 }
 
 /* ---------------- Responsive ---------------- */

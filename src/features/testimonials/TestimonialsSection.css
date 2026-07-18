@@ -1,0 +1,32 @@
+.testimonial-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+}
+
+.testimonial-stars {
+  color: #ffd700; /* gold stars */
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.testimonial-stars-empty {
+  color: #ddd; /* grey for empty stars */
+}
+
+.testimonial-message {
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 10px 0;
+  color: #333;
+}
+
+.testimonial-author {
+  margin-top: 8px;
+  font-weight: bold;
+  color: #d4af37; /* gold accent */
+}

@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PublicLayout from "../publicLayout/PublicLayout";
 import StatusBadge from "../../shared/StatusBadge";
 import { trackBookingByCodeAndMobile } from "./bookingService";
-import { STAGES, getTopLevelStatus } from "../../shared/statuses";
+import { STAGES, getTopLevelStatus, TOP_LEVEL } from "../../shared/statuses";
+import { hasTestimonialForBooking } from "../testimonials/testimonialService";
+import TestimonialForm from "../testimonials/TestimonialForm";
 import "./TrackBooking.css";
 
 export default function TrackBooking() {
@@ -13,11 +15,31 @@ export default function TrackBooking() {
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(null);
   const [error, setError] = useState("");
+  const [alreadyReviewed, setAlreadyReviewed] = useState(null);
+  const [justSubmittedReview, setJustSubmittedReview] = useState(false);
+
+  const isCompleted = booking && getTopLevelStatus(booking.stageIndex, booking.cancelled) === TOP_LEVEL.COMPLETED;
+
+  useEffect(() => {
+    if (!isCompleted) {
+      setAlreadyReviewed(null);
+      return;
+    }
+    let cancelled = false;
+    hasTestimonialForBooking(booking.bookingCode).then((exists) => {
+      if (!cancelled) setAlreadyReviewed(exists);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCompleted, booking?.bookingCode]);
 
   async function handleSearch(e) {
     e.preventDefault();
     setError("");
     setBooking(null);
+    setJustSubmittedReview(false);
     if (!code.trim() || !mobile.trim()) {
       setError("Please enter both your booking code and mobile number.");
       return;
@@ -95,28 +117,58 @@ export default function TrackBooking() {
               })}
             </div>
 
-            {(booking.photoSelectionLink || booking.deliveryLink) && (
-              <div className="photo-links-section">
-                {booking.deliveryLink && (
-                  <a href={booking.deliveryLink} target="_blank" rel="noreferrer" className="photo-link-card ready">
-                    <span className="photo-link-icon">🎉</span>
-                    <span className="photo-link-text">
-                      <strong>Your Photos Are Ready!</strong>
-                      <span>Tap to view and download your final photos</span>
-                    </span>
-                    <span className="photo-link-arrow">→</span>
-                  </a>
-                )}
-                {booking.photoSelectionLink && (
-                  <a href={booking.photoSelectionLink} target="_blank" rel="noreferrer" className="photo-link-card">
-                    <span className="photo-link-icon">📸</span>
-                    <span className="photo-link-text">
-                      <strong>Select Your Favorite Photos</strong>
-                      <span>Tap to browse and choose which photos to include</span>
-                    </span>
-                    <span className="photo-link-arrow">→</span>
-                  </a>
-                )}
+            {(() => {
+              const selectionStageIdx = STAGES.indexOf("Photo Selection");
+              const deliveryStageIdx = STAGES.length - 1; // "Ready for Delivery" is always the last stage
+              const stageIdx = booking.stageIndex ?? 0;
+
+              // "Select Your Favorite Photos" is only relevant once the
+              // studio has actually reached that stage, and stops being
+              // relevant once the shoot is fully delivered.
+              const showSelection = booking.photoSelectionLink && stageIdx >= selectionStageIdx && stageIdx < deliveryStageIdx;
+
+              // "Your Photos Are Ready" only makes sense once the
+              // booking has actually reached the final stage.
+              const showDelivery = booking.deliveryLink && stageIdx >= deliveryStageIdx;
+
+              if (!showSelection && !showDelivery) return null;
+
+              return (
+                <div className="photo-links-section">
+                  {showDelivery && (
+                    <a href={booking.deliveryLink} target="_blank" rel="noreferrer" className="photo-link-card ready">
+                      <span className="photo-link-icon">🎉</span>
+                      <span className="photo-link-text">
+                        <strong>Your Photos Are Ready!</strong>
+                        <span>Tap to view and download your final photos</span>
+                      </span>
+                      <span className="photo-link-arrow">→</span>
+                    </a>
+                  )}
+                  {showSelection && (
+                    <a href={booking.photoSelectionLink} target="_blank" rel="noreferrer" className="photo-link-card">
+                      <span className="photo-link-icon">📸</span>
+                      <span className="photo-link-text">
+                        <strong>Select Your Favorite Photos</strong>
+                        <span>Tap to browse and choose which photos to include</span>
+                      </span>
+                      <span className="photo-link-arrow">→</span>
+                    </a>
+                  )}
+                </div>
+              );
+            })()}
+            {isCompleted && !justSubmittedReview && alreadyReviewed === false && (
+              <TestimonialForm
+                bookingCode={booking.bookingCode}
+                customerName={booking.customerName}
+                onSubmitted={() => setJustSubmittedReview(true)}
+              />
+            )}
+
+            {isCompleted && (justSubmittedReview || alreadyReviewed === true) && (
+              <div className="testimonial-thanks">
+                💛 Thanks for your review — we really appreciate it!
               </div>
             )}
           </div>

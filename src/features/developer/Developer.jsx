@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import GetStartedModal from "./GetStartedModal";
 import "./Developer.css";
 
 // -----------------------------------------------------------------------
@@ -18,7 +19,7 @@ const DEVELOPER = {
   whatsapp: "8431163258",
   email: "chaandru5432@gmail.com",
   linkedin: "linkedin.com/in/chandrashekar",
-  linkedinUrl: "https://linkedin.com/in/chandrashekar",
+  linkedinUrl: "https://linkedin.com/in/",
   location: "India",
 };
 
@@ -58,6 +59,8 @@ const SERVICES = [
 ];
 
 export default function Developer() {
+  const [showGetStarted, setShowGetStarted] = useState(false);
+
   return (
     <div className="dev-page">
       <header className="dev-header">
@@ -88,9 +91,9 @@ export default function Developer() {
           </h1>
           <p className="dev-bio">{DEVELOPER.bio}</p>
           <div className="dev-hero-actions">
-            <a href={`https://wa.me/91${DEVELOPER.whatsapp}`} target="_blank" rel="noreferrer" className="dev-btn dev-btn-primary">
+            <button className="dev-btn dev-btn-primary" onClick={() => setShowGetStarted(true)}>
               ✈ Get In Touch
-            </a>
+            </button>
             <a href="#dev-services" className="dev-btn dev-btn-outline">
               View Services
             </a>
@@ -98,10 +101,9 @@ export default function Developer() {
         </div>
 
         <div className="dev-hero-photo-wrap">
-         <div className="dev-photo-circle">
+          <div className="dev-photo-circle">
   <img src="/images/DevProfile.jpeg" alt={DEVELOPER.name} />
-</div>
-
+          </div>
           <div className="dev-name-tag">
             <div className="dev-name-tag-name">{DEVELOPER.name}</div>
             <div className="dev-name-tag-role">{DEVELOPER.role}</div>
@@ -156,9 +158,9 @@ export default function Developer() {
               <div className="dev-cta-desc">Let's discuss and turn your ideas into reality.</div>
             </div>
           </div>
-          <a href={`mailto:${DEVELOPER.email}`} className="dev-btn dev-btn-primary">
+          <button className="dev-btn dev-btn-primary" onClick={() => setShowGetStarted(true)}>
             ✈ Send a Project Inquiry
-          </a>
+          </button>
         </div>
       </section>
 
@@ -200,6 +202,8 @@ export default function Developer() {
           <span>© {new Date().getFullYear()} JP Studio. All Rights Reserved.</span>
         </div>
       </footer>
+
+      {showGetStarted && <GetStartedModal onClose={() => setShowGetStarted(false)} />}
     </div>
   );
 }

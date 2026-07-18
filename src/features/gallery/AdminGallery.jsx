@@ -104,7 +104,7 @@ export default function Gallery() {
           return (
             <div key={p.id} className="gallery-photo-wrap">
               {thumbSrc ? (
-                <img src={thumbSrc} alt="Gallery item" className="gallery-photo" />
+                <img src={thumbSrc} alt="Gallery item" className="gallery-photo" loading="lazy" decoding="async" />
               ) : (
                 <div className="gallery-photo gallery-video-placeholder">🎬</div>
               )}

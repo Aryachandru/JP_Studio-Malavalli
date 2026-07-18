@@ -1,10 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PublicLayout from "../publicLayout/PublicLayout";
 import { subscribeToPackages } from "../packages/packageService";
 import { subscribeToGallery } from "../gallery/galleryService";
 import { subscribeToSettings } from "../settings/settingsService";
-import { getYouTubeEmbedUrl, getYouTubeThumbnail } from "../../shared/youtube";
+import { getYouTubeThumbnail } from "../../shared/youtube";
+import GalleryLightbox from "../gallery/GalleryLightbox";
+import TestimonialsSection from "../testimonials/TestimonialsSection";
+import Carousel from "../../shared/Carousel";
 import "./Home.css";
 
 const QUICK_LINKS = [
@@ -19,6 +22,7 @@ export default function Home() {
   const [packages, setPackages] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [settings, setSettings] = useState({});
+  const [openVideoIndex, setOpenVideoIndex] = useState(null);
 
   useEffect(() => {
     const unsub1 = subscribeToPackages(setPackages);
@@ -31,14 +35,23 @@ export default function Home() {
     };
   }, []);
 
-  const featuredPackages = packages.filter((p) => p.status === "Active").slice(0, 3);
-  const previewPhotos = photos.slice(0, 6);
+  const featuredPackages = packages.filter((p) => p.status === "Active");
+  // Capped (not the full gallery) so the homepage doesn't load dozens of
+  // externally-hosted images at once — the full gallery lives at /gallery.
+  const previewPhotos = photos.slice(0, 12);
+
   const heroImages = settings.heroImages && settings.heroImages.length > 0
     ? settings.heroImages
     : settings.heroImageUrl
     ? [settings.heroImageUrl]
     : [];
-  const youtubeEmbedUrl = useMemo(() => getYouTubeEmbedUrl(settings.youtubeUrl), [settings.youtubeUrl]);
+
+  const youtubeUrls = settings.youtubeUrls && settings.youtubeUrls.length > 0
+    ? settings.youtubeUrls
+    : settings.youtubeUrl
+    ? [settings.youtubeUrl]
+    : [];
+  const videoItems = youtubeUrls.map((url) => ({ mediaType: "video", url }));
 
   return (
     <PublicLayout>
@@ -64,7 +77,7 @@ export default function Home() {
             <h2>Popular Packages</h2>
             <Link to="/packages" className="section-view-all">View All →</Link>
           </div>
-          <div className="grid grid-3 package-preview-grid">
+          <Carousel>
             {featuredPackages.map((p) => (
               <div key={p.id} className="card package-preview-card">
                 <div
@@ -73,13 +86,12 @@ export default function Home() {
                 />
                 <h3>{p.name}</h3>
                 <p className="package-preview-price">₹{Number(p.price).toLocaleString("en-IN")}</p>
-                {p.description && <p className="package-preview-desc">{p.description}</p>}
                 <Link to={`/book?package=${encodeURIComponent(p.name)}`} className="btn btn-gold btn-block">
                   Book This Package
                 </Link>
               </div>
             ))}
-          </div>
+          </Carousel>
         </section>
       )}
 
@@ -90,37 +102,59 @@ export default function Home() {
             <h2>Recent Work</h2>
             <Link to="/gallery" className="section-view-all">View Full Gallery →</Link>
           </div>
-          <div className="gallery-preview-grid">
+          <Carousel>
             {previewPhotos.map((p) => {
               const thumbSrc = p.mediaType === "video" ? getYouTubeThumbnail(p.url) || p.url : p.url;
               return (
                 <Link key={p.id} to="/gallery" className="gallery-preview-photo-wrap">
-                  <img src={thumbSrc} alt="Studio work" className="gallery-preview-photo" />
+                  <img src={thumbSrc} alt="Studio work" className="gallery-preview-photo" loading="lazy" decoding="async" />
                   {p.mediaType === "video" && <span className="gallery-preview-play">▶</span>}
                 </Link>
               );
             })}
-          </div>
+          </Carousel>
         </section>
       )}
 
-      {/* ---------------- YouTube video ---------------- */}
-      {youtubeEmbedUrl && (
+      {/* ---------------- YouTube videos ---------------- */}
+      {videoItems.length > 0 && (
         <section className="section">
           <div className="section-head">
             <h2>Watch Our Story</h2>
           </div>
-          <div className="youtube-embed-wrap">
-            <iframe
-              src={youtubeEmbedUrl}
-              title="Studio video"
-              className="youtube-embed-iframe"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
+          <Carousel visibleDesktop={4} visibleTablet={2} visibleMobile={1}>
+            {videoItems.map((v, idx) => (
+              <button
+                key={v.url + idx}
+                type="button"
+                className="video-preview-card"
+                onClick={() => setOpenVideoIndex(idx)}
+              >
+                <img
+                  src={getYouTubeThumbnail(v.url)}
+                  alt="Studio video"
+                  className="video-preview-thumb"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span className="video-preview-play">▶</span>
+              </button>
+            ))}
+          </Carousel>
         </section>
       )}
+
+      {openVideoIndex !== null && (
+        <GalleryLightbox
+          items={videoItems}
+          index={openVideoIndex}
+          onClose={() => setOpenVideoIndex(null)}
+          onNavigate={setOpenVideoIndex}
+        />
+      )}
+
+      {/* ---------------- Testimonials ---------------- */}
+      <TestimonialsSection />
 
       {/* ---------------- CTA banner ---------------- */}
       <section className="cta-banner">

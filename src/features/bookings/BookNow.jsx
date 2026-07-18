@@ -6,11 +6,13 @@ import BookingCalendar from "./BookingCalendar";
 import { upsertCustomerFromBooking } from "../customers/customerService";
 import { subscribeToPackages, PACKAGE_CATEGORIES } from "../packages/packageService";
 import { subscribeToSettings } from "../settings/settingsService";
+import { useDialog } from "../../shared/DialogProvider";
 import "./BookNow.css";
 
 const STEPS = ["Event Details", "Package", "Review", "Confirmation"];
 
 export default function BookNow() {
+    const { alertDialog, confirmDialog } = useDialog();
   const [searchParams] = useSearchParams();
   const preselectedPackage = searchParams.get("package") || "";
 
@@ -64,17 +66,33 @@ export default function BookNow() {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function next() {
-    if (step === 0 && (!form.customerName || !form.mobile || !form.eventDate || !form.eventType)) {
-      alert("Please fill in your name, mobile number, event type and date.");
-      return;
-    }
-    if (step === 1 && !form.packageName) {
-      alert("Please select a package.");
-      return;
-    }
-    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+async function next() {
+  if (
+    step === 0 &&
+    (!form.customerName || !form.mobile || !form.eventDate || !form.eventType)
+  ) {
+    await alertDialog(
+      "Please fill in your name, mobile number, event type and date."
+    );
+    return;
   }
+
+  if (step === 1 && !form.packageName) {
+    await alertDialog("Please select a package.");
+    return;
+  }
+
+  // Example: if you want a confirmation before moving to final step
+  if (step === 2) {
+    const confirmed = await confirmDialog(
+      "Do you want to confirm this booking?"
+    );
+    if (!confirmed) return;
+  }
+
+  setStep((s) => Math.min(s + 1, STEPS.length - 1));
+}
+
 
   function back() {
     setStep((s) => Math.max(s - 1, 0));
@@ -148,7 +166,8 @@ export default function BookNow() {
                   ))}
                 </select>
               </div>
-              <div className="field">
+              <div classNa
+              me="field">
                 <label>Event Date</label>
                 <BookingCalendar
                   value={form.eventDate}

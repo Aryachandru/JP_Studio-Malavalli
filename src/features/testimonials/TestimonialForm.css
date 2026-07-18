@@ -1,0 +1,41 @@
+/* TestimonialForm.css — src/features/testimonials/TestimonialForm.jsx only */
+
+.testimonial-form-card {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.testimonial-form-card h4 { font-size: 15px; margin-bottom: 4px; }
+.testimonial-form-hint { font-size: 12px; color: var(--ink-400); margin-bottom: 14px; }
+
+.testimonial-star-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.testimonial-star {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  color: var(--border);
+  padding: 0;
+  line-height: 1;
+}
+.testimonial-star.filled { color: var(--gold-500); }
+
+.testimonial-textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: #fbfbfd;
+  font-family: inherit;
+  font-size: 14px;
+  margin-bottom: 12px;
+  resize: vertical;
+}
+.testimonial-textarea:focus { outline: none; border-color: var(--gold-500); background: #fff; }
+
+@media (max-width: 480px) {
+  .testimonial-star { font-size: 24px; }
+}

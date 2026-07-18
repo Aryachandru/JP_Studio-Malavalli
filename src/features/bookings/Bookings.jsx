@@ -97,7 +97,8 @@ export default function Bookings() {
               </div>
               <div style={{ fontSize: 12, color: "var(--ink-400)" }}>
                 {b.eventDate} · ₹{Number(b.amount || 0).toLocaleString("en-IN")}
-                {b.source === "admin" && <span className="source-tag">Booked by Client</span>}
+                {b.source === "admin" && <span className="source-tag">Booked by Admin</span>}
+  {b.source === "public" && <span className="source-tag">Booked by Client</span>}
               </div>
             </div>
             <StatusBadge label={getTopLevelStatus(b.stageIndex, b.cancelled) === TOP_LEVEL.IN_PROGRESS ? stageStatusOf(b) : getTopLevelStatus(b.stageIndex, b.cancelled)} />
