@@ -1,28 +1,86 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Package, Image, CalendarCheck, Search, MapPin } from "lucide-react";
 import PublicLayout from "../publicLayout/PublicLayout";
 import { subscribeToPackages } from "../packages/packageService";
 import { subscribeToGallery } from "../gallery/galleryService";
 import { subscribeToSettings } from "../settings/settingsService";
-import { getYouTubeThumbnail } from "../../shared/youtube";
-import GalleryLightbox from "../gallery/GalleryLightbox";
+import { getYouTubeEmbedUrl, getYouTubeThumbnail } from "../../shared/youtube";
 import TestimonialsSection from "../testimonials/TestimonialsSection";
-import Carousel from "../../shared/Carousel";
 import "./Home.css";
 
+// Each quick link now carries an Icon component + a two-stop gradient
+// instead of an emoji, so every tile gets its own 3D glass-icon look.
 const QUICK_LINKS = [
-  { to: "/packages", icon: "📦", title: "Packages", desc: "Browse our photography packages" },
-  { to: "/gallery", icon: "🖼️", title: "Gallery", desc: "See our recent work" },
-  { to: "/book", icon: "📅", title: "Book Now", desc: "Reserve your date in minutes" },
-  { to: "/track", icon: "🔍", title: "Track Booking", desc: "Check your project status" },
-  { to: "/contact", icon: "📍", title: "Contact & Location", desc: "Visit us or reach out" },
+  {
+    to: "/packages",
+    Icon: Package,
+    title: "Packages",
+    desc: "Browse our photography packages",
+    from: "#FDBA74",
+    to2: "#EA580C",
+    glow: "rgba(234,88,12,0.45)",
+  },
+  {
+    to: "/gallery",
+    Icon: Image,
+    title: "Gallery",
+    desc: "See our recent work",
+    from: "#C4B5FD",
+    to2: "#7C3AED",
+    glow: "rgba(124,58,237,0.45)",
+  },
+  {
+    to: "/book",
+    Icon: CalendarCheck,
+    title: "Book Now",
+    desc: "Reserve your date in minutes",
+    from: "#5EEAD4",
+    to2: "#0D9488",
+    glow: "rgba(13,148,136,0.45)",
+  },
+  {
+    to: "/track",
+    Icon: Search,
+    title: "Track Booking",
+    desc: "Check your project status",
+    from: "#93C5FD",
+    to2: "#2563EB",
+    glow: "rgba(37,99,235,0.45)",
+  },
+  {
+    to: "/contact",
+    Icon: MapPin,
+    title: "Contact & Location",
+    desc: "Visit us or reach out",
+    from: "#FDA4AF",
+    to2: "#E11D48",
+    glow: "rgba(225,29,72,0.45)",
+  },
 ];
+
+// Renders a single quick-link icon as a glossy 3D gradient tile.
+// Kept as a small local component so Home.jsx stays self-contained —
+// move it to its own file if you reuse this look elsewhere.
+function QuickCardIcon({ Icon, from, to2, glow }) {
+  return (
+    <div
+      className="quick-card-icon-3d"
+      style={{
+        background: `linear-gradient(155deg, ${from} 0%, ${to2} 100%)`,
+        boxShadow: `inset 0 2px 3px rgba(255,255,255,0.55), inset 0 -6px 10px rgba(0,0,0,0.25), 0 10px 20px -6px ${glow}, 0 2px 4px rgba(0,0,0,0.15)`,
+      }}
+    >
+      <div className="quick-card-icon-3d-gloss" />
+      <Icon size={26} strokeWidth={2.25} className="quick-card-icon-3d-glyph" />
+    </div>
+  );
+}
 
 export default function Home() {
   const [packages, setPackages] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [settings, setSettings] = useState({});
-  const [openVideoIndex, setOpenVideoIndex] = useState(null);
 
   useEffect(() => {
     const unsub1 = subscribeToPackages(setPackages);
@@ -35,23 +93,14 @@ export default function Home() {
     };
   }, []);
 
-  const featuredPackages = packages.filter((p) => p.status === "Active");
-  // Capped (not the full gallery) so the homepage doesn't load dozens of
-  // externally-hosted images at once — the full gallery lives at /gallery.
-  const previewPhotos = photos.slice(0, 12);
-
+  const featuredPackages = packages.filter((p) => p.status === "Active").slice(0, 3);
+  const previewPhotos = photos.slice(0, 6);
   const heroImages = settings.heroImages && settings.heroImages.length > 0
     ? settings.heroImages
     : settings.heroImageUrl
     ? [settings.heroImageUrl]
     : [];
-
-  const youtubeUrls = settings.youtubeUrls && settings.youtubeUrls.length > 0
-    ? settings.youtubeUrls
-    : settings.youtubeUrl
-    ? [settings.youtubeUrl]
-    : [];
-  const videoItems = youtubeUrls.map((url) => ({ mediaType: "video", url }));
+  const youtubeEmbedUrl = useMemo(() => getYouTubeEmbedUrl(settings.youtubeUrl), [settings.youtubeUrl]);
 
   return (
     <PublicLayout>
@@ -62,7 +111,7 @@ export default function Home() {
         <div className="quick-grid">
           {QUICK_LINKS.map((q) => (
             <Link key={q.to} to={q.to} className="quick-card">
-              <div className="quick-card-icon">{q.icon}</div>
+              <QuickCardIcon Icon={q.Icon} from={q.from} to2={q.to2} glow={q.glow} />
               <div className="quick-card-title">{q.title}</div>
               <div className="quick-card-desc">{q.desc}</div>
             </Link>
@@ -77,7 +126,7 @@ export default function Home() {
             <h2>Popular Packages</h2>
             <Link to="/packages" className="section-view-all">View All →</Link>
           </div>
-          <Carousel>
+          <div className="grid grid-3 package-preview-grid">
             {featuredPackages.map((p) => (
               <div key={p.id} className="card package-preview-card">
                 <div
@@ -86,12 +135,13 @@ export default function Home() {
                 />
                 <h3>{p.name}</h3>
                 <p className="package-preview-price">₹{Number(p.price).toLocaleString("en-IN")}</p>
+                {p.description && <p className="package-preview-desc">{p.description}</p>}
                 <Link to={`/book?package=${encodeURIComponent(p.name)}`} className="btn btn-gold btn-block">
                   Book This Package
                 </Link>
               </div>
             ))}
-          </Carousel>
+          </div>
         </section>
       )}
 
@@ -102,55 +152,36 @@ export default function Home() {
             <h2>Recent Work</h2>
             <Link to="/gallery" className="section-view-all">View Full Gallery →</Link>
           </div>
-          <Carousel>
+          <div className="gallery-preview-grid">
             {previewPhotos.map((p) => {
               const thumbSrc = p.mediaType === "video" ? getYouTubeThumbnail(p.url) || p.url : p.url;
               return (
                 <Link key={p.id} to="/gallery" className="gallery-preview-photo-wrap">
-                  <img src={thumbSrc} alt="Studio work" className="gallery-preview-photo" loading="lazy" decoding="async" />
+                  <img src={thumbSrc} alt="Studio work" className="gallery-preview-photo" />
                   {p.mediaType === "video" && <span className="gallery-preview-play">▶</span>}
                 </Link>
               );
             })}
-          </Carousel>
+          </div>
         </section>
       )}
 
-      {/* ---------------- YouTube videos ---------------- */}
-      {videoItems.length > 0 && (
+      {/* ---------------- YouTube video ---------------- */}
+      {youtubeEmbedUrl && (
         <section className="section">
           <div className="section-head">
             <h2>Watch Our Story</h2>
           </div>
-          <Carousel visibleDesktop={4} visibleTablet={2} visibleMobile={1}>
-            {videoItems.map((v, idx) => (
-              <button
-                key={v.url + idx}
-                type="button"
-                className="video-preview-card"
-                onClick={() => setOpenVideoIndex(idx)}
-              >
-                <img
-                  src={getYouTubeThumbnail(v.url)}
-                  alt="Studio video"
-                  className="video-preview-thumb"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span className="video-preview-play">▶</span>
-              </button>
-            ))}
-          </Carousel>
+          <div className="youtube-embed-wrap">
+            <iframe
+              src={youtubeEmbedUrl}
+              title="Studio video"
+              className="youtube-embed-iframe"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
         </section>
-      )}
-
-      {openVideoIndex !== null && (
-        <GalleryLightbox
-          items={videoItems}
-          index={openVideoIndex}
-          onClose={() => setOpenVideoIndex(null)}
-          onNavigate={setOpenVideoIndex}
-        />
       )}
 
       {/* ---------------- Testimonials ---------------- */}
@@ -183,7 +214,6 @@ function HeroCarousel({ images, studioName }) {
   }, [images.length]);
 
   useEffect(() => {
-    // If the image list shrinks (admin removed a photo), keep index valid.
     if (index >= images.length) setIndex(0);
   }, [images.length, index]);
 

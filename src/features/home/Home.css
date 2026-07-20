@@ -67,33 +67,6 @@
   border-radius: var(--radius-md);
   background: var(--bg-canvas);
 }
-.video-preview-card {
-  position: relative;
-  display: block;
-  width: 100%;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--navy-900);
-}
-.video-preview-thumb {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-  display: block;
-}
-.video-preview-play {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 24px;
-  background: rgba(15, 18, 30, 0.35);
-}
 .slick-slide {
   padding: 0 8px;   /* gap between slides */
 }
@@ -163,4 +136,35 @@
   font-size: 20px;
   background: rgba(15, 18, 30, 0.3);
   border-radius: var(--radius-md);
+}
+
+/* Base tile for the 3D quick-link icons (Packages, Gallery, Book Now,
+   Track Booking, Contact & Location). This class was previously
+   missing — only the gloss overlay and glyph color were defined —
+   so the tile had no fixed size, shape, or centering of its own. */
+.quick-card-icon-3d {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  overflow: hidden;
+}
+
+.quick-card-icon-3d-gloss {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.65), transparent 55%);
+  opacity: 0.8;
+}
+
+.quick-card-icon-3d-glyph {
+  position: relative;
+  color: #fff;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
 }
