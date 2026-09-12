@@ -23,15 +23,16 @@ export default function BookNow() {
   const [saving, setSaving] = useState(false);
   const [confirmedCode, setConfirmedCode] = useState(null);
   const [form, setForm] = useState({
-    customerName: "",
-    mobile: "",
-    email: "",
-    eventType: "",
-    eventDate: "",
-    location: "",
-    packageName: preselectedPackage,
-    amount: "",
-  });
+  customerName: "",
+  mobile: "",
+  email: "",
+  eventType: "",
+  eventDate: "",
+  location: "",
+  packageName: preselectedPackage,
+  amount: "",
+  customEventName: "",
+});
 
   useEffect(() => {
     const unsub = subscribeToPackages((rows) => {
@@ -77,10 +78,22 @@ async function next() {
     return;
   }
 
-  if (step === 1 && !form.packageName) {
+  if (step === 1) {
+  if (form.eventType === "Custom") {
+    if (!form.customEventName.trim()) {
+      await alertDialog("Please enter the name of your event.");
+      return;
+    }
+
+    if (!form.amount || Number(form.amount) <= 0) {
+      await alertDialog("Please enter a valid amount.");
+      return;
+    }
+  } else if (!form.packageName) {
     await alertDialog("Please select a package.");
     return;
   }
+}
 
   // Example: if you want a confirmation before moving to final step
   if (step === 2) {
@@ -200,35 +213,101 @@ async function next() {
           )}
 
           {step === 1 && (
-            <div>
-              <h3 style={{ marginBottom: 4 }}>Choose a Package</h3>
-              <p className="wizard-note" style={{ marginBottom: 12 }}>
-                Showing {form.eventType || "all"} packages{form.eventType ? "" : " — pick an event type in Step 1 to narrow this down"}.
-              </p>
-              {packagesForEventType.length === 0 && (
-                <div className="empty-state">No {form.eventType} packages available right now.</div>
-              )}
-              {packagesForEventType.map((p) => (
-                <div
-                  key={p.id}
-                  className={`list-row package-option${form.packageName === p.name ? " selected" : ""}`}
-                  onClick={() => selectPackage(p)}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600 }}>{p.name}</div>
-                    <div style={{ fontSize: 12, color: "var(--ink-400)" }}>₹{Number(p.price).toLocaleString("en-IN")}</div>
-                    {p.inclusions && p.inclusions.length > 0 && (
-                      <div style={{ fontSize: 11, color: "var(--ink-400)", marginTop: 4 }}>
-                        {p.inclusions.slice(0, 3).join(" · ")}
-                      </div>
-                    )}
-                  </div>
-                  {form.packageName === p.name && <span style={{ color: "var(--gold-600)" }}>✓ Selected</span>}
-                </div>
-              ))}
-            </div>
-          )}
+  <div>
+    {form.eventType === "Custom" ? (
+      <>
+        <h3 style={{ marginBottom: 4 }}>Custom Event Details</h3>
 
+        <p className="wizard-note" style={{ marginBottom: 12 }}>
+          Enter the name of your custom event and the booking amount.
+        </p>
+
+        <div className="field">
+          <label>Event Name</label>
+          <input
+            type="text"
+            placeholder="Enter the name of your event"
+            value={form.customEventName}
+            onChange={(e) =>
+              update("customEventName", e.target.value)
+            }
+          />
+        </div>
+
+        <div className="field">
+          <label>Amount (₹)</label>
+          <input
+            type="number"
+            min="0"
+            placeholder="Enter booking amount"
+            value={form.amount}
+            onChange={(e) =>
+              update("amount", e.target.value)
+            }
+          />
+        </div>
+      </>
+    ) : (
+      <>
+        <h3 style={{ marginBottom: 4 }}>Choose a Package</h3>
+
+        <p className="wizard-note" style={{ marginBottom: 12 }}>
+          Showing {form.eventType || "all"} packages
+          {form.eventType
+            ? ""
+            : " — pick an event type in Step 1 to narrow this down"}.
+        </p>
+
+        {packagesForEventType.length === 0 && (
+          <div className="empty-state">
+            No {form.eventType} packages available right now.
+          </div>
+        )}
+
+        {packagesForEventType.map((p) => (
+          <div
+            key={p.id}
+            className={`list-row package-option${
+              form.packageName === p.name ? " selected" : ""
+            }`}
+            onClick={() => selectPackage(p)}
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600 }}>{p.name}</div>
+
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--ink-400)",
+                }}
+              >
+                ₹{Number(p.price).toLocaleString("en-IN")}
+              </div>
+
+              {p.inclusions && p.inclusions.length > 0 && (
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "var(--ink-400)",
+                    marginTop: 4,
+                  }}
+                >
+                  {p.inclusions.slice(0, 3).join(" · ")}
+                </div>
+              )}
+            </div>
+
+            {form.packageName === p.name && (
+              <span style={{ color: "var(--gold-600)" }}>
+                ✓ Selected
+              </span>
+            )}
+          </div>
+        ))}
+      </>
+    )}
+  </div>
+)}
           {step === 2 && (
             <div>
               <h3 style={{ marginBottom: 14 }}>Review &amp; Confirm</h3>
@@ -236,7 +315,14 @@ async function next() {
               <SummaryRow label="Mobile" value={form.mobile} />
               <SummaryRow label="Event" value={`${form.eventType} · ${form.eventDate}`} />
               <SummaryRow label="Location" value={form.location} />
-              <SummaryRow label="Package" value={form.packageName} />
+              <SummaryRow
+  label="Package"
+  value={
+    form.eventType === "Custom"
+      ? form.customEventName
+      : form.packageName
+  }
+/>
               <SummaryRow label="Amount" value={`₹${Number(form.amount || 0).toLocaleString("en-IN")}`} />
               <p className="wizard-note">
                 By confirming, our team will reach out on your mobile number to finalize details.

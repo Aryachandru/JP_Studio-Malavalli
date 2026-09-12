@@ -17,7 +17,7 @@ const packagesCol = collection(db, "packages");
 // filtered by event type: admin package form, public Book Now cascading
 // dropdown, and Packages page tabs. Keep this list in sync with the event
 // type options on the booking forms.
-export const PACKAGE_CATEGORIES = ["Wedding", "Pre Wedding", "Baby Shoot", "Birthday", "Maternity"];
+export const PACKAGE_CATEGORIES = ["Wedding", "Pre Wedding", "Baby Shoot", "Birthday", "Maternity", "House Warming","Product Photography","Drone Photography", "Custom"];
 
 // PUBLIC-SAFE: anyone can read packages (shown on the public site).
 export function subscribeToPackages(callback) {
