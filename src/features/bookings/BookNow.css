@@ -2,8 +2,42 @@
 
 .wizard-card { max-width: 640px; margin: 0 auto; }
 
-.steps-row { display: flex; justify-content: space-between; margin-bottom: 28px; }
-.step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; position: relative; }
+/* On the Event Details step the card widens to fit the 3-column layout
+   (form + calendar + sidebar). Every other step keeps the original
+   narrow, centered single-column card. */
+.wizard-card-wide { max-width: 1100px; }
+
+/* ---------------- Step indicator ---------------- */
+.steps-row {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+/* full-width track behind the circles */
+.steps-row::before {
+  content: "";
+  position: absolute;
+  top: 16px; /* half of the 32px circle */
+  left: 16.6%;
+  right: 16.6%;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+/* gold progress overlay, driven by the --progress custom property set inline */
+.steps-row::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 16.6%;
+  width: calc((100% - 33.2%) * var(--progress, 0%) / 100%);
+  height: 2px;
+  background: var(--gold-500);
+  z-index: 0;
+  transition: width 0.3s ease;
+}
+.step-item { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1; position: relative; z-index: 1; }
 .step-circle {
   width: 32px;
   height: 32px;
@@ -18,6 +52,76 @@
 }
 .step-item.done .step-circle, .step-item.active .step-circle { background: var(--gold-500); color: #fff; }
 .step-item span.step-label { font-size: 12px; color: var(--ink-600); }
+
+/* ---------------- Event Details 3-column layout ---------------- */
+.booking-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(280px, 1.15fr) minmax(220px, 0.85fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.booking-form-col { min-width: 0; }
+
+.booking-calendar-col { min-width: 0; }
+.calendar-panel {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 16px);
+  padding: 20px;
+}
+
+.date-preview-input {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 10px);
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--ink-900, #1a1a1a);
+  cursor: pointer;
+  text-align: left;
+}
+.date-preview-input:hover { border-color: var(--gold-500); }
+.date-preview-placeholder { color: var(--ink-400); }
+.date-taken-note { color: #8a1f16; }
+
+.booking-sidebar-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.sidebar-photo {
+  border-radius: var(--radius-md, 16px);
+  overflow: hidden;
+  height: 180px;
+  /* Fallback color shows while the image loads, or if the src is
+     ever missing/broken — remove once a real photo is wired in. */
+  background: linear-gradient(160deg, var(--gold-050, #fbeed8) 0%, var(--gold-100, #f4dcb0) 100%);
+}
+.sidebar-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.info-card { display: flex; align-items: flex-start; gap: 12px; }
+.info-card-icon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.info-card-icon.icon-gold { background: var(--gold-050, #fdf0da); color: var(--gold-600, #b8860b); }
+.info-card-icon.icon-blue { background: #e7f0fe; color: #2f6fd6; }
+.info-card-icon.icon-green { background: #e6f6ec; color: #1f9a52; }
+.info-card-title { font-weight: 600; font-size: 14px; margin-bottom: 2px; }
+.info-card-text { font-size: 12.5px; color: var(--ink-400); line-height: 1.4; margin: 0; }
 
 .package-option { cursor: pointer; border-radius: 12px; padding: 12px 10px; border: 2px solid transparent; }
 .package-option.selected { border-color: var(--gold-500); }
@@ -72,6 +176,28 @@
 }
 
 /* ---------------- Responsive ---------------- */
+
+/* Large tablets / small laptops: drop to 2 columns, sidebar becomes a
+   full-width row of cards under the form + calendar. The photo now
+   spans the full row above the info cards, sized down a little. */
+@media (max-width: 1100px) {
+  .wizard-card-wide { max-width: 780px; }
+  .booking-grid { grid-template-columns: 1fr 1fr; }
+  .booking-sidebar-col {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .sidebar-photo { flex: 1 1 100%; height: 140px; }
+  .info-card { flex: 1 1 220px; }
+}
+
+/* Tablets: form and calendar stack, sidebar cards stay in a row */
+@media (max-width: 860px) {
+  .wizard-card-wide { max-width: 640px; }
+  .booking-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 768px) {
   .wizard-card { max-width: 100%; }
   .step-item span.step-label { display: none; }
@@ -81,4 +207,7 @@
   .wizard-actions { flex-direction: column; }
   .wizard-actions .btn { width: 100%; }
   .booking-success-code { font-size: 20px; }
+  .booking-sidebar-col { flex-direction: column; }
+  .sidebar-photo { height: 160px; }
+  .info-card { flex: 1 1 auto; }
 }
