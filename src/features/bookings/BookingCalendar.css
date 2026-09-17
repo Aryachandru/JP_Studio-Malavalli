@@ -1,35 +1,42 @@
-/* BookingCalendar.css — src/features/bookings/BookingCalendar.jsx only */
+/* BookingCalendar.css — src/pages/public/BookingCalendar.jsx only */
 
-.bcal {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  background: #fbfbfd;
-}
+.bcal { width: 100%; }
 
 .bcal-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+}
+.bcal-month-label {
+  font-family: var(--font-display, inherit);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--ink-900, #1a1a1a);
 }
 .bcal-nav-btn {
-  border: 1px solid var(--border);
-  background: #fff;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  font-size: 15px;
-  color: var(--ink-600);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--gold-050, #fbeed8);
+  color: var(--ink-700, #333);
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
+.bcal-nav-btn:hover:not(:disabled) { background: var(--gold-100, #f4dcb0); }
 .bcal-nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.bcal-month-label { font-weight: 700; font-size: 14px; }
 
 .bcal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
+
 .bcal-day-name {
   text-align: center;
   font-size: 11px;
@@ -39,63 +46,64 @@
 }
 
 .bcal-cell {
-  aspect-ratio: 1;
-  border: 1px solid transparent;
-  background: #fff;
-  border-radius: 8px;
-  font-size: 13px;
-  color: var(--ink-900);
-  cursor: pointer;
-}
-.bcal-cell:hover:not(:disabled) { border-color: var(--gold-500); }
-.bcal-cell.muted { visibility: hidden; }
-
-.bcal-cell.disabled {
-  color: var(--ink-400);
-  background: #f3f3f6;
-  cursor: not-allowed;
-}
-.bcal-cell.booked {
-  background: var(--red-bg);
-  color: var(--red);
-  font-weight: 600;
   position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink-700, #333);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+.bcal-cell:hover:not(.disabled):not(.selected) { background: var(--gold-050, #fbeed8); }
+
+.bcal-cell.muted { color: var(--ink-200, #ccc); }
+.bcal-cell.disabled { cursor: not-allowed; color: var(--ink-200, #ccc); }
+
+.bcal-cell.booked { background: var(--surface-muted, #f3f3f1); }
 .bcal-booked-dot {
   position: absolute;
-  bottom: 3px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 5px;
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--ink-400, #999);
 }
+
 .bcal-cell.selected {
-  background: var(--gold-500);
+  background: var(--gold-500, #f0a020);
   color: #fff;
   font-weight: 700;
 }
+.bcal-cell.selected .bcal-booked-dot { background: #fff; }
 
 .bcal-legend {
   display: flex;
-  gap: 14px;
   flex-wrap: wrap;
-  margin-top: 12px;
-  font-size: 11px;
-  color: var(--ink-600);
+  gap: 14px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--ink-400);
 }
-.bcal-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.bcal-legend span { display: flex; align-items: center; gap: 6px; }
 .bcal-swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
   display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
 }
-.bcal-swatch.available { background: #fff; border: 1px solid var(--border); }
-.bcal-swatch.booked { background: var(--red-bg); border: 1px solid var(--red); }
-.bcal-swatch.selected { background: var(--gold-500); }
+.bcal-swatch.available { background: var(--gold-500, #f0a020); }
+.bcal-swatch.booked { background: var(--ink-200, #ccc); }
+.bcal-swatch.selected { background: var(--gold-500, #f0a020); }
 
-@media (max-width: 480px) {
-  .bcal-cell { font-size: 12px; }
+/* ---------------- Responsive ---------------- */
+@media (max-width: 380px) {
+  .bcal-grid { gap: 4px; }
+  .bcal-cell { font-size: 12px; border-radius: 8px; }
+  .bcal-day-name { font-size: 10px; }
 }

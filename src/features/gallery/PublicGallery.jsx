@@ -51,12 +51,18 @@ export default function PublicGallery() {
 
   return (
     <PublicLayout>
-      <section className="page-header">
-        <h1>Our Gallery</h1>
-        <p>A few favorites from weddings, pre-weddings, birthdays and more.</p>
+      <section className="page-header gallery-page-header">
+        <picture>
+          <source media="(max-width: 640px)" srcSet="/images/gallery.jpg" />
+          <img
+            src="/images/gallerydesktop.jpg"
+            alt="Our Gallery — Capturing Life's Beautiful Moments. Real People. Real Stories. Beautiful Frames."
+            className="gallery-full-banner-img"
+          />
+        </picture>
       </section>
 
-      <section className="section">
+      <section className="section gallery-section">
         <div className="tab-row public-gallery-tabs">
           {CATEGORIES.map((c) => (
             <button

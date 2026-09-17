@@ -1,13 +1,139 @@
 /* Contact.css — src/features/contact/Contact.jsx only */
 
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 24px;
-  align-items: start;
+/* ====================================================================
+   Header: text + decorative art.
+   The !important overrides below are intentional: your global
+   .page-header rules apparently center-align text and don't expect a
+   second flex child, which was fighting this layout. Scoping the
+   override to .contact-page-header keeps every other page untouched.
+   ==================================================================== */
+.contact-page-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 32px;
+  text-align: left !important;
+  flex-wrap: wrap;
+}
+.contact-page-header h1,
+.contact-page-header p,
+.contact-header-text {
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
-.contact-info-card h3 { margin-bottom: 16px; }
+.contact-header-text { flex: 1 1 360px; max-width: 560px; }
+
+.contact-pill {
+  display: inline-block;
+  background: var(--gold-050, #fdf0da);
+  color: var(--gold-600, #b8860b);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.contact-header-text h1 .accent { color: var(--gold-600, #b8860b); }
+
+.contact-feature-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+}
+.contact-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-700, #333);
+  white-space: nowrap;
+}
+.contact-feature-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.contact-feature-icon.icon-gold { background: var(--gold-050, #fdf0da); color: var(--gold-600, #b8860b); }
+.contact-feature-icon.icon-rose { background: #fde7ee; color: #d6336c; }
+.contact-feature-icon.icon-blue { background: #e7f0fe; color: #2f6fd6; }
+
+.contact-header-art {
+  flex: 0 1 280px;
+  position: relative;
+  min-width: 200px;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px; /* room for the caption tag above the frame */
+}
+.contact-header-art-frame {
+  width: 100%;
+  height: 160px;
+  border-radius: var(--radius-md, 16px);
+  overflow: hidden;
+  /* Fallback color shows while the image loads, or if the src is
+     ever missing/broken — remove once a real photo is wired in. */
+  background: linear-gradient(160deg, var(--gold-050, #fbeed8) 0%, var(--gold-100, #f4dcb0) 100%);
+}
+.contact-header-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.contact-header-caption {
+  position: absolute;
+  top: -18px;
+  left: 8px;
+  font-family: var(--font-display, cursive);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink-700, #333);
+  background: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: rotate(-3deg);
+  z-index: 1;
+  white-space: nowrap;
+}
+
+/* ====================================================================
+   3-column cards — stretched to equal height, each card is a column
+   flex layout so the CTA (button) anchors to the bottom regardless of
+   how much content the other cards have.
+   ==================================================================== */
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.contact-grid .card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0;
+}
+.contact-card-body { padding: 24px 24px 0; flex: 1 1 auto; }
+.contact-card-cta { padding: 18px 24px 24px; }
+
+.contact-form-card form { display: flex; flex-direction: column; height: 100%; }
+
+.contact-info-card h3, .contact-form-card h3 { margin-bottom: 6px; }
+.contact-info-intro { font-size: 12.5px; color: var(--ink-400); margin-bottom: 14px; }
 
 .contact-row {
   display: flex;
@@ -19,25 +145,85 @@
   font-size: 14px;
 }
 .contact-row:last-of-type { border-bottom: none; }
-.contact-icon { font-size: 16px; }
+.contact-icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--gold-050, #fdf0da);
+  color: var(--gold-600, #b8860b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.contact-row-label { display: block; font-size: 11px; color: var(--ink-400); }
+.contact-row-value { display: block; font-weight: 600; }
+
+.contact-follow-label { font-size: 13px; font-weight: 600; margin-top: 16px; margin-bottom: 10px; }
 
 .contact-social-row {
   display: flex;
   gap: 10px;
-  margin-top: 16px;
   flex-wrap: wrap;
+  margin-bottom: 4px;
 }
+.social-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex: none;
+}
+.social-instagram { background: #d6336c; }
+.social-facebook { background: #2f6fd6; }
+.social-youtube { background: #e0342c; }
+.social-whatsapp { background: #25b661; }
 
-.contact-map-card { padding: 0; overflow: hidden; min-height: 320px; }
+/* ---------------- Message form card ---------------- */
+.contact-form-card textarea {
+  width: 100%;
+  resize: vertical;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 10px);
+  padding: 10px 12px;
+}
+.contact-form-card .btn-block { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+.contact-form-error { margin-top: 10px; font-size: 12.5px; color: #b3261e; text-align: center; }
+
+/* ---------------- Map card ---------------- */
+.contact-map-card { overflow: hidden; min-height: 320px; }
+.contact-map-header {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.contact-map-title { font-weight: 700; font-size: 15px; }
+.contact-map-address { font-size: 12.5px; color: var(--ink-400); margin-top: 2px; }
+.contact-map-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-top: 6px;
+  color: var(--ink-700, #333);
+}
+.contact-map-stars { display: flex; gap: 1px; color: var(--gold-500, #f0a020); }
+.contact-map-link { display: inline-block; margin-top: 6px; font-size: 12.5px; color: var(--gold-600, #b8860b); font-weight: 600; }
+
 .contact-map-iframe {
   width: 100%;
-  height: 100%;
-  min-height: 320px;
+  flex: 1 1 auto;
+  min-height: 260px;
   border: none;
   display: block;
 }
 .contact-map-placeholder {
-  height: 320px;
+  flex: 1 1 auto;
+  min-height: 260px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -50,7 +236,47 @@
 }
 .contact-map-placeholder p { font-size: 13px; max-width: 260px; }
 
-/* ---------------- Responsive ---------------- */
-@media (max-width: 900px) {
+/* ====================================================================
+   Responsive: mobile / tablet / laptop+
+   ==================================================================== */
+
+/* Laptop and up: full 3-column layout (default rules above already
+   cover this — this breakpoint just caps how wide the cards can grow
+   on very large monitors so they don't over-stretch). */
+@media (min-width: 1400px) {
+  .contact-grid { grid-template-columns: 1fr 1fr 1.2fr; }
+  .contact-header-art { flex-basis: 340px; }
+  .contact-header-art-frame { height: 200px; }
+}
+
+/* Tablet: 2 columns, map card takes the full second row */
+@media (max-width: 1100px) {
+  .contact-grid { grid-template-columns: 1fr 1fr; }
+  .contact-map-card { grid-column: 1 / -1; }
+  .contact-map-card { min-height: 280px; }
+}
+
+@media (max-width: 860px) {
+  .contact-page-header { flex-direction: column !important; align-items: flex-start !important; }
+  .contact-header-art { flex-basis: auto; width: 100%; max-width: 320px; }
+}
+
+/* Mobile: everything stacks, header centers for a cleaner small-screen read */
+@media (max-width: 640px) {
   .contact-grid { grid-template-columns: 1fr; }
+  .contact-map-card { grid-column: auto; }
+  .contact-grid .card { height: auto; }
+
+  .contact-page-header,
+  .contact-page-header h1,
+  .contact-page-header p {
+    text-align: center !important;
+  }
+  .contact-header-text { max-width: none; }
+  .contact-feature-row { justify-content: center; }
+  .contact-header-art { margin: 24px auto 0; }
+  .contact-header-art-frame { height: 200px; }
+
+  .contact-card-body { padding: 20px 20px 0; }
+  .contact-card-cta { padding: 16px 20px 20px; }
 }

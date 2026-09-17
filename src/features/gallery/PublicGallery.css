@@ -1,115 +1,156 @@
-/* Gallery.css — src/pages/public/Gallery.jsx only */
+/* PublicGallery.css — src/features/gallery/PublicGallery.jsx only */
 
-.public-gallery-tabs { justify-content: center; display: flex; }
+/* ====================================================================
+   Header — a single full-width banner image (heading, tagline and
+   photo are all baked into the picture itself). Two crops: a wide one
+   for tablet/laptop/desktop, a taller one for phones.
+   ==================================================================== */
+.gallery-page-header {
+  padding: 0;
+  overflow: hidden;
+}
 
+.gallery-page-header picture,
+.gallery-full-banner-img {
+  display: block;
+  width: 100%;
+}
+
+.gallery-full-banner-img {
+  object-fit: cover;
+}
+
+/* Desktop/laptop crop is a wide landscape image */
+@media (min-width: 641px) {
+  .gallery-full-banner-img { aspect-ratio: 1790 / 724; }
+}
+
+/* Mobile crop is a taller portrait image */
+@media (max-width: 640px) {
+  .gallery-full-banner-img { aspect-ratio: 382 / 724; }
+}
+
+/* ====================================================================
+   Category tabs — now their own row directly under the banner.
+   ==================================================================== */
+.gallery-section { padding-top: 24px; }
+
+.public-gallery-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.public-gallery-tabs .tab-pill {
+  background: transparent;
+  border: 1px solid var(--border, #e5e5e5);
+  color: var(--ink-600, #555);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.public-gallery-tabs .tab-pill.active {
+  background: var(--gold-500, #f0a020);
+  border-color: var(--gold-500, #f0a020);
+  color: #fff;
+}
+.public-gallery-tabs .tab-pill:hover:not(.active) {
+  border-color: var(--gold-500, #f0a020);
+  color: var(--gold-600, #b8860b);
+}
+
+.gallery-section .loading-line,
+.gallery-section .empty-state {
+  text-align: center;
+  color: var(--ink-400);
+  padding: 40px 0;
+}
+
+/* ====================================================================
+   Gallery grid — 2 / 3 / 4 / 5 columns across mobile, tablet and
+   laptop / desktop.
+   ==================================================================== */
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.gallery-photo-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--surface-muted, #f3f3f1);
 }
 .gallery-photo {
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-md);
-  background: var(--bg-canvas);
-  cursor: pointer;
-  transition: transform 0.15s ease;
+  display: block;
+  transition: transform 0.35s ease;
 }
-.gallery-photo:hover { transform: scale(1.02); }
+.gallery-photo-wrap:hover .gallery-photo { transform: scale(1.06); }
 
-.gallery-lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 12, 20, 0.85);
+.gallery-video-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 200;
-  padding: 24px;
+  font-size: 28px;
+  color: var(--ink-400);
 }
-.gallery-lightbox img {
-  max-width: 100%;
-  max-height: 90vh;
-  border-radius: var(--radius-md);
+
+.gallery-play-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  pointer-events: none;
 }
 
 /* ---------------- Responsive ---------------- */
-@media (max-width: 768px) {
-  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+
+/* Tablet */
+@media (min-width: 700px) {
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
 
-@media (max-width: 480px) {
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
-  .public-gallery-tabs { flex-wrap: wrap; }
-}
-.gallery-lightbox {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+/* Small laptop */
+@media (min-width: 1024px) {
+  .gallery-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
 }
 
-.gallery-lightbox img {
-  max-width: 90%;
-  max-height: 80%;
+/* Laptop / desktop */
+@media (min-width: 1280px) {
+  .gallery-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; }
 }
 
-.lightbox-close,
-.lightbox-prev,
-.lightbox-next {
-  position: absolute;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
+/* Small phones: let the tab row scroll instead of wrapping tall */
+@media (max-width: 420px) {
+  .public-gallery-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    justify-content: flex-start;
+  }
+  .public-gallery-tabs::-webkit-scrollbar { display: none; }
 }
-.gallery-video {
-  width: 100%;
-  aspect-ratio: 1;       /* same square ratio as photos */
-  object-fit: cover;     /* crop video preview */
-  border-radius: var(--radius-md);
-  background: var(--bg-canvas);
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-.gallery-video:hover { transform: scale(1.02); }
-
-
-.gallery-lightbox {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.gallery-lightbox img,
-.gallery-lightbox video {
-  max-width: 90%;
-  max-height: 80%;
-}
-
-.lightbox-close,
-.lightbox-prev,
-.lightbox-next {
-  position: absolute;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
-}
-
-.lightbox-close { top: 20px; right: 30px; }
-.lightbox-prev { left: 30px; top: 50%; transform: translateY(-50%); }
-.lightbox-next { right: 30px; top: 50%; transform: translateY(-50%); }
-
