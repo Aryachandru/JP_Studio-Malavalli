@@ -1,46 +1,254 @@
-/* Gallery.css — src/pages/Gallery.jsx only */
+/* PublicGallery.css — src/features/gallery/PublicGallery.jsx only */
 
-.gallery-toolbar {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
+/* ====================================================================
+   Header — light theme, two columns (text + photo). Your global
+   .page-header centers text by default, which fights a left-aligned
+   column layout, so the overrides below are scoped tightly to
+   .gallery-page-header and use !important the same defensive way the
+   Contact page header does.
+   ==================================================================== */
+.gallery-page-header {
+  padding: 48px 24px;
+}
+
+.gallery-header-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 40px;
   flex-wrap: wrap;
+}
+
+.gallery-header-text,
+.gallery-header-text h1,
+.gallery-header-text p {
+  text-align: left !important;
+}
+.gallery-header-text { flex: 1 1 380px; max-width: 520px; }
+
+.gallery-eyebrow {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold-500, #f0a020);
+  margin-bottom: 12px;
+}
+
+.gallery-page-header h1 {
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 1.25;
+  color: var(--ink-900, #1a1a1a);
+  margin-bottom: 12px;
+}
+.gallery-page-header h1 .accent { color: var(--gold-500, #f0a020); }
+
+.gallery-page-header p {
+  color: var(--ink-400);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* ---------------- Category tabs (now inside the header column) ---------------- */
+.public-gallery-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   gap: 10px;
+}
+.public-gallery-tabs .tab-pill {
+  background: transparent;
+  border: 1px solid var(--border, #e5e5e5);
+  color: var(--ink-600, #555);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.public-gallery-tabs .tab-pill.active {
+  background: var(--gold-500, #f0a020);
+  border-color: var(--gold-500, #f0a020);
+  color: #fff;
+}
+.public-gallery-tabs .tab-pill:hover:not(.active) {
+  border-color: var(--gold-500, #f0a020);
+  color: var(--gold-600, #b8860b);
+}
+
+/* ---------------- Header art: leaf backdrop + photo + caption ---------------- */
+.gallery-header-art {
+  position: relative;
+  flex: 0 1 320px;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 22px; /* room for the caption tag above the frame */
+}
+
+/* Soft decorative backdrop standing in for a leaf/branch illustration */
+.gallery-header-leaf {
+  position: absolute;
+  inset: -20px;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(240, 160, 32, 0.12), transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(240, 160, 32, 0.1), transparent 55%);
+  border-radius: 50%;
+}
+
+.gallery-header-art-frame {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 220px;
+  border-radius: var(--radius-md, 16px);
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(160deg, var(--gold-050, #fbeed8) 0%, var(--gold-100, #f4dcb0) 100%);
+}
+.gallery-header-art-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-header-caption {
+  position: absolute;
+  top: -14px;
+  left: 4px;
+  z-index: 2;
+  font-family: var(--font-display, cursive);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-700, #333);
+  background: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: rotate(-3deg);
+  white-space: nowrap;
+}
+
+/* ====================================================================
+   Gallery grid — 2 / 3 / 4 / 5 columns across mobile, tablet and
+   laptop / desktop.
+   ==================================================================== */
+.gallery-section { padding-top: 28px; }
+
+.gallery-section .loading-line,
+.gallery-section .empty-state {
+  text-align: center;
+  color: var(--ink-400);
+  padding: 40px 0;
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
-.gallery-photo-wrap { position: relative; }
+
+.gallery-photo-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md, 12px);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--surface-muted, #f3f3f1);
+}
 .gallery-photo {
   width: 100%;
-  aspect-ratio: 1;
+  height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-md);
-  background: var(--bg-canvas);
+  display: block;
+  transition: transform 0.35s ease;
 }
-.gallery-delete-btn {
+.gallery-photo-wrap:hover .gallery-photo { transform: scale(1.06); }
+
+.gallery-video-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--ink-400);
+}
+
+.gallery-play-badge {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  background: rgba(20, 24, 40, 0.65);
-  border: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
   color: #fff;
-  border-radius: 6px;
-  width: 26px;
-  height: 26px;
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  pointer-events: none;
 }
 
 /* ---------------- Responsive ---------------- */
-@media (max-width: 768px) {
-  .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+
+/* Tablet */
+@media (min-width: 700px) {
+  .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
 
-@media (max-width: 480px) {
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .gallery-toolbar { flex-direction: column; align-items: stretch; }
-  .gallery-toolbar .btn { width: 100%; justify-content: center; }
+/* Small laptop */
+@media (min-width: 1024px) {
+  .gallery-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .gallery-page-header h1 { font-size: 38px; }
+}
+
+/* Laptop / desktop */
+@media (min-width: 1280px) {
+  .gallery-grid { grid-template-columns: repeat(5, 1fr); gap: 20px; }
+}
+
+/* Header stacks on narrow tablets and phones */
+@media (max-width: 860px) {
+  .gallery-header-grid { flex-direction: column; align-items: flex-start !important; }
+  .gallery-header-art { width: 100%; max-width: 320px; }
+}
+
+@media (max-width: 640px) {
+  .gallery-header-text,
+  .gallery-page-header h1,
+  .gallery-page-header p {
+    text-align: center !important;
+  }
+  .gallery-header-grid { align-items: center !important; }
+  .gallery-header-text { max-width: none; }
+  .public-gallery-tabs { justify-content: center; }
+  .gallery-header-art { margin: 24px auto 0; align-self: center; }
+}
+
+/* Small phones: let the tab row scroll instead of wrapping tall */
+@media (max-width: 420px) {
+  .public-gallery-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    justify-content: flex-start;
+  }
+  .public-gallery-tabs::-webkit-scrollbar { display: none; }
 }
